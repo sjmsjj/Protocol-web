@@ -144,7 +144,21 @@ function save_protocol(){
 			alert(n);
 		}
 		else{
-			alert('hehe');
+			var data = build_json_data(protocol, days, names, details, notes, n);
+			var csrftoken = getCookie('csrftoken');
+			$.ajax({
+				type: "post",
+				url: "{% url 'add_protocol' %}",
+                data: {"t" : "t"},
+                dataType: "text",
+                // contentType: "application/json",
+                beforeSend: function(xhr, settings){
+				    xhr.setRequestHeader('X-CSRFToken', csrftoken);
+			    },
+			    success: function(response){
+			    	alert(response);
+			    },
+			});
 		}
 	}
 }
@@ -152,6 +166,7 @@ function save_protocol(){
 function validate_data(days, names, details){
 	var steps = days.length;
 	var end = steps;
+	//filter the empty rows
 	for(var i = steps-1; i >= 0; i--){
 		if(days[i] === '' && names[i] === '' && details[i] === '')
 			end--;
@@ -182,9 +197,36 @@ function validate_data(days, names, details){
 	return end;
 }
 
+function build_json_data(protocol, days, names, details, notes, n){
+	var data = [];
+	var steps = [];
+	data.push({'protocol':protocol});
+	for(var i=0; i < n; i++){
+		steps.push({'day'    : days[i],
+                    'name'   : names[i],
+                    'detail' : details[i],
+                    'note'   : notes[i],
+                    }
+	    );
+	}
+	data.push({'steps':steps});
+	return data;
+}
 
-
-
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
 </script>
 
 {% endblock main %}
