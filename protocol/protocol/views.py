@@ -37,5 +37,5 @@ class AddProtocolView(View):
 		return render(request, 'protocol/add_protocol.html', params)
 
 	def post(self, request, *args, **kwargs):
-		pass
+		return HttpResponse("thanks")
 
