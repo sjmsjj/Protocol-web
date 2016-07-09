@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+    Protocol Detail
+{% endblock page_title %}
+
+{% block main %}
+<style type="text/css">
+/*    li{
+    	margin: 20px;
+    }*/
+</style>
+
+<div class='container'>
+    <div class='row'>
+        <div class='col-md-12 text-center'>
+		    <h2>{{protocol.name}}</h2>
+        </div>
+    </div>
+
+    <div class='row'>
+        <div class='col-md-12'>
+		    <ol>
+		    	{% for step in steps %}
+		    	    <li style='margin:20px;'>
+		    	    	<label>{{step.name}}:&nbsp</label>{{step.detail}}
+		    	    	{% if step.note %}
+		    	    	    <ul style="list-style-type:disc">
+		    	    	    	<li ><i>{{step.note}}</i></li>
+		    	    	    </ul>
+		    	    	{% endif %}
+		    	    </li>
+		    	{% endfor %}
+		    </ol>
+        </div>
+    </div>
+</div>
+
+{% endblock main %}

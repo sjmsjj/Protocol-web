@@ -5,91 +5,91 @@
 {% endblock page_title %}
 
 {% block main %}
-    <style type="text/css">
-        table tr td{
-        	text-align: center;
-        	vertical-align: bottom;
-        }
-	    input, textarea {
-		    border: none;
-		    width: 100%;
-		    height: 40px;
-		    display: block;
-		    text-align: center;
-		    -webkit-box-sizing: border-box; 
-		       -moz-box-sizing: border-box;
-		            box-sizing: border-box; 
-	    }
+<style type="text/css">
+    table tr td{
+    	text-align: center;
+    	vertical-align: bottom;
+    }
+    input, textarea {
+	    border: none;
+	    width: 100%;
+	    height: 40px;
+	    display: block;
+	    text-align: center;
+	    -webkit-box-sizing: border-box; 
+	       -moz-box-sizing: border-box;
+	            box-sizing: border-box; 
+    }
 
-		input[type='number'] {
-			-moz-appearance:textfield;
-		}
-		input::-webkit-outer-spin-button,
-		input::-webkit-inner-spin-button {
-			-webkit-appearance: none;
-		}
-    </style>
+	input[type='number'] {
+		-moz-appearance:textfield;
+	}
+	input::-webkit-outer-spin-button,
+	input::-webkit-inner-spin-button {
+		-webkit-appearance: none;
+	}
+</style>
 
-    <div class='container'>
-    	<div class='row'>
-    		<div class='col-md-12 text-center'>
-    			<h2>Add New Protocol</h2>
-    		</div>
-    	</div>
+<div class='container'>
+	<div class='row'>
+		<div class='col-md-12 text-center'>
+			<h2>Add New Protocol</h2>
+		</div>
+	</div>
 
-    	<div class='row'>
-    		<div class='col-md-4'>
-    			<label>Protocol Name:</label>
-    			<input type='text' class='form-control' id='protocol'>
-    		</div>
-    	</div>
+	<div class='row'>
+		<div class='col-md-4'>
+			<label>Protocol Name:</label>
+			<input type='text' class='form-control' id='protocol'>
+		</div>
+	</div>
 
-    	<div class="row">
-    		<div class='col-md-12'>
-    			<label>Steps</label>
-    		</div>
-    	</div>
-	    <div class='row'>
-	    	<div class='col-md-12 table-responsive'>
-			    <table id='tbSteps' class='table table-bordered table-hover table-condensed'>
-			        <thead>
-			        	<tr>
-			        		<td width='5%'>Step</td>
-			        		<td width='%'5>Day</td>
-			        		<td width='20%'>Short Name</td>
-			        		<td width='50%'>Detail description</td>
-			        		<td width='20%'>Note</td>
+	<div class="row">
+		<div class='col-md-12'>
+			<label>Steps</label>
+		</div>
+	</div>
+    <div class='row'>
+    	<div class='col-md-12 table-responsive'>
+		    <table id='tbSteps' class='table table-bordered table-hover table-condensed'>
+		        <thead>
+		        	<tr>
+		        		<td width='5%'>Step</td>
+		        		<td width='%'5>Day</td>
+		        		<td width='20%'>Short Name</td>
+		        		<td width='50%'>Detail description</td>
+		        		<td width='20%'>Note (Optional)</td>
+		        	</tr>
+		        </thead>
+
+		        <tbody>
+		        	{% for i in "123" %}
+			        	<tr id="{{i}}">
+			        		<td>{{i}}</td>
+			        		<td><input type="number" class='form-control'></td>
+		                    <td><input type="text" class='form-control'></td>
+		                    <td><textarea rows='1' class='form-control'></textarea></td>
+		                    <td><textarea rows='1' class='form-control'></textarea></td>
 			        	</tr>
-			        </thead>
-
-			        <tbody>
-			        	{% for i in "123" %}
-				        	<tr id="{{i}}">
-				        		<td>{{i}}</td>
-				        		<td><input type="number" class='form-control'></td>
-			                    <td><input type="text" class='form-control'></td>
-			                    <td><textarea rows='1' class='form-control'></textarea></td>
-			                    <td><textarea rows='1' class='form-control'></textarea></td>
-				        	</tr>
-			        	{% endfor %}
-			        </tbody>
-			    </table>
-		    </div>
-	    <div>
-
-	    <div class='row'>
-	    	<div class='col-md-12'>
-	    	    <button id="btnAddStep" type="button" class="btn btn-default navbar-btn navbar-right">Add one step</button>
-	    	</div>
+		        	{% endfor %}
+		        </tbody>
+		    </table>
 	    </div>
+    <div>
 
-        <div class='row'>
-        	<div class='col-md-12'>
-        		<a href="{% url 'main' %}"><button id='btnCancelAddProtocol' type="button" class="btn btn-default navbar-right navbar-text">Cancel</button></a>
-	            <button id='btnAddProtocol' type="button" class="btn btn-default navbar-right navbar-text">Save</button>
-        	</div>
-        </div>
+    <div class='row'>
+    	<div class='col-md-12'>
+    	    <button id="btnAddStep" type="button" class="btn btn-default navbar-btn navbar-right">Add one step</button>
+    	</div>
     </div>
+
+    <div class='row'>
+    	<div class='col-md-12'>
+    		<a href="{% url 'main' %}"><button id='btnCancelAddProtocol' type="button" class="btn btn-default navbar-right navbar-text">Cancel</button></a>
+            <button id='btnAddProtocol' type="button" class="btn btn-default navbar-right navbar-text">Save</button>
+    	</div>
+    </div>
+</div>
 
 
 <script type="text/javascript">
@@ -148,12 +148,14 @@ function save_protocol(){
 			var csrftoken = getCookie('csrftoken');
 			$.ajax({
 				type: "post",
-				url: "{% url 'add_protocol' %}",
-                data: {"t" : "t"},
+				url: "{% url 'save_protocol' %}",
+                data: data,
                 dataType: "text",
+                contentType: 'application/json',
                 // contentType: "application/json",
                 beforeSend: function(xhr, settings){
 				    xhr.setRequestHeader('X-CSRFToken', csrftoken);
+				    // xhr.setRequestHeader( "Content-type", "application/json" );
 			    },
 			    success: function(response){
 			    	alert(response);
@@ -198,19 +200,20 @@ function validate_data(days, names, details){
 }
 
 function build_json_data(protocol, days, names, details, notes, n){
-	var data = [];
+	var data;
 	var steps = [];
-	data.push({'protocol':protocol});
 	for(var i=0; i < n; i++){
 		steps.push({'day'    : days[i],
                     'name'   : names[i],
                     'detail' : details[i],
                     'note'   : notes[i],
-                    }
-	    );
+                    });
 	}
-	data.push({'steps':steps});
-	return data;
+	data = {
+		'name' : protocol,
+		'steps' : steps,
+	};
+	return JSON.stringify(data);
 }
 
 function getCookie(name) {
