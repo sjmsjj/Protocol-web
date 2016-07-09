@@ -16,10 +16,18 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from rest_framework.urlpatterns import format_suffix_patterns
+
 import views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^main/$', views.MainView.as_view(), name='main'),
     url(r'^addProtocol/$', views.AddProtocolView.as_view(), name='add_protocol'),
+    url(r'^saveProtocol/$', views.SaveProtocolAPIView.as_view(), name='save_protocol'),
+    url(r'^api/protocols/$', views.ProtocolListAPIView.as_view()),
 ]
+
+
+urlpatterns = format_suffix_patterns(urlpatterns)
+

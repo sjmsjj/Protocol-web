@@ -58,7 +58,7 @@
 			        		<td width='%'5>Day</td>
 			        		<td width='20%'>Short Name</td>
 			        		<td width='50%'>Detail description</td>
-			        		<td width='20%'>Note</td>
+			        		<td width='20%'>Note (Optional)</td>
 			        	</tr>
 			        </thead>
 
@@ -148,12 +148,14 @@ function save_protocol(){
 			var csrftoken = getCookie('csrftoken');
 			$.ajax({
 				type: "post",
-				url: "{% url 'add_protocol' %}",
-                data: {"t" : "t"},
+				url: "{% url 'save_protocol' %}",
+                data: data,
                 dataType: "text",
+                contentType: 'application/json',
                 // contentType: "application/json",
                 beforeSend: function(xhr, settings){
 				    xhr.setRequestHeader('X-CSRFToken', csrftoken);
+				    // xhr.setRequestHeader( "Content-type", "application/json" );
 			    },
 			    success: function(response){
 			    	alert(response);
@@ -198,19 +200,20 @@ function validate_data(days, names, details){
 }
 
 function build_json_data(protocol, days, names, details, notes, n){
-	var data = [];
+	var data;
 	var steps = [];
-	data.push({'protocol':protocol});
 	for(var i=0; i < n; i++){
 		steps.push({'day'    : days[i],
                     'name'   : names[i],
                     'detail' : details[i],
                     'note'   : notes[i],
-                    }
-	    );
+                    });
 	}
-	data.push({'steps':steps});
-	return data;
+	data = {
+		'name' : protocol,
+		'steps' : steps,
+	};
+	return JSON.stringify(data);
 }
 
 function getCookie(name) {
