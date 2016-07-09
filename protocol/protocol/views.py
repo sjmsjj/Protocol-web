@@ -47,9 +47,14 @@ class ProtocolListView(ListView):
 	context_object_name = 'protocols'
 
 class ProtocolDetailView(DetailView):
-	model = Protocol
-	template_name = 'protocol/protocol_detail.html'
-	context_object_name = 'protocol'
+	def get(self, request, *args, **kwargs):
+		protocol_name = self.kwargs.get('protocol')
+		protocol = Protocol.objects.get(name=protocol_name)
+		steps = protocol.steps.all()
+		params = {'protocol' : protocol,
+		          'steps' : steps 
+		         }
+		return render(request, 'protocol/protocol_detail.html', params)
 
 
 class SaveProtocolAPIView(APIView):
@@ -65,3 +70,11 @@ class ProtocolListAPIView(APIView):
 		protocols = Protocol.objects.all()
 		serializer = ProtocolSerializer(protocols, many=True)
 		return Response(serializer.data)
+
+class ProtocolDetailAPIView(APIView):
+	def get(self, request, format=None):
+		protocol_name = self.args[0]
+		protocol = Protocol.objects.get(name=protocol_name)
+		serializer = ProtocolSerializer([protocol], many=True)
+		return Response(serializer.data)
+

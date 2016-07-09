@@ -40,7 +40,11 @@
 		        	{% for protocol in protocols %}
 			        	<tr id="{{protocol.name}}">
 			        		<td>{{forloop.counter}}</td>
-			        		<td>{{protocol.name}}</td>
+			        		
+			        		<td>
+			        			<a href="{% url 'protocol_detail' protocol=protocol.name %}">{{protocol.name}}</a>
+			        		</td>
+
 		                    <td><button>Start new experiment</button>
 		                    	<button>Edit</button>
 		                    	<button>Delete</button>
