@@ -46,6 +46,36 @@ class ProtocolListView(ListView):
 	template_name = 'protocol/protocol_list.html'
 	context_object_name = 'protocols'
 
+	def post(self, request, *args, **kwargs):
+		message = 'Sorry, cannot finish this task right now'
+		try:
+			protocol_name = request.POST.get('protocol')
+			action = request.POST.get('action')
+			if action == 'start new experiment':
+				message = self.add_new_experiment(protocol_name)
+			elif action == 'delete protocol':
+				message = self.delete_protocol(protocol_name)
+		except Exception:
+			pass
+		return HttpResponse(message)
+
+	def add_new_experiment(self, protocol_name):
+		message = 'success'
+		try:
+			protocol = Protocol.objects.get(name=protocol_name)
+			today = datetime.date.today()
+			experiment = Experiment.objects.create(start_date=today, protocol=protocol)
+			experiment.save()
+			protocol.ninstance += 1
+			protocol.save()
+		except Exception:
+			message = 'start experiment failed'
+		return message
+
+	def delete_protocol(self, protocol_name):
+		return 'deletion to be implemented'
+
+
 class ProtocolDetailView(DetailView):
 	def get(self, request, *args, **kwargs):
 		protocol_name = self.kwargs.get('protocol')

@@ -2,6 +2,7 @@ from django.db import models
 
 class Protocol(models.Model):
 	name = models.CharField(primary_key = True, max_length=100)
+	ninstance = models.IntegerField(default=0)
 
 	def __str__(self):
 		return 'Protocol: %s' % self.name
