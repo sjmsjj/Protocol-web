@@ -8,8 +8,8 @@ class Protocol(models.Model):
 		return 'Protocol: %s' % self.name
 
 class Step(models.Model):
-	protocol = models.ForeignKey(Protocol, primary_key=True, related_name='steps', on_delete=models.CASCADE)
-	name = models.CharField(max_length=100, primary_key=True)
+	protocol = models.ForeignKey(Protocol, related_name='steps', on_delete=models.CASCADE)
+	name = models.CharField(max_length=100)
 	day = models.IntegerField()
 	detail = models.TextField()
 	note = models.TextField(null=True, blank=True)
@@ -18,9 +18,8 @@ class Step(models.Model):
 		ordering = ['protocol', 'day']
 
 class Experiment(models.Model):
-	protocol = models.ForeignKey(Protocol, related_name='experiments')
+	protocol = models.ForeignKey(Protocol, related_name='experiments', on_delete=models.CASCADE)
 	start_date = models.DateField()
 
 	class Meta:
 		ordering = ['start_date']
-

@@ -69,11 +69,16 @@ class ProtocolListView(ListView):
 			protocol.ninstance += 1
 			protocol.save()
 		except Exception:
-			message = 'start experiment failed'
+			message = 'start new experiment %s failed' % protocol_name
 		return message
 
 	def delete_protocol(self, protocol_name):
-		return 'deletion to be implemented'
+		message = 'success'
+		try:
+			Protocol.objects.get(name=protocol_name).delete()
+		except Exception:
+			message = 'delete protocol %s failed' % protocol_name
+		return message
 
 
 class ProtocolDetailView(DetailView):

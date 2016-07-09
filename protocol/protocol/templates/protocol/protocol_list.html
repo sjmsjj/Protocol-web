@@ -4,6 +4,8 @@
     Protocol List
 {% endblock page_title %}
 
+{% load protocol_tags %}
+
 {% block main %}
 <style type="text/css">
     table thead td{
@@ -48,7 +50,7 @@
 		                    <td>
 		                    	<button class='btnStartExperiment' value='{{protocol.name}}'>Start new experiment</button>
 		                    	<button class='btnEditProtocol' value='{{protocol.name}}'>Edit</button>
-		                    	<button class='btnDeleteProtocol' value='{{protocol.name}}'>Delete</button>
+		                    	<button class='btnDeleteProtocol' value='{{protocol.name}}' name='{{protocol.ninstance}}'>Delete</button>
 		                    </td>
 			        	</tr>
 		        	{% endfor %}
@@ -76,9 +78,13 @@ function start_new_experiment(){
 function delete_protocol(){
 	protocol_name = this.value;
 	action = 'delete protocol';
-	if(confirm('Do you want to delete this protocol?')){
-		send_action_to_server(protocol_name, action)
-
+	var ninstance = Number(this.name);
+	var delete_protocol_confirm_message = 'Do you want to delete this protocol?';
+    if(ninstance > 0){
+    	delete_protocol_confirm_message = 'You have on going experiments with this protocol, delete the protocol will also delete all the related experiments, do you want to continue to delete this protocol?';
+    }
+	if(confirm(delete_protocol_confirm_message)){
+		send_action_to_server(protocol_name, action);
 	}
 }
 
@@ -93,7 +99,9 @@ function send_action_to_server(protcol_name, acition){
 		    xhr.setRequestHeader('X-CSRFToken', csrftoken);
 	    },
 	    success: function(response){
-	    	alert(response);
+	    	if(response != 'success'){
+	    		alert(response);
+	    	}
 	    },
 	});
 }
