@@ -14,8 +14,8 @@ class ProtocolSerializer(serializers.ModelSerializer):
 		fields = ['name', 'steps']
 
 	def create(self, validated_data):
-		steps = validated_data.pop('steps')
+		new_steps = validated_data.pop('steps')
 		protocol = Protocol.objects.create(**validated_data)
-		for step in steps:
+		for step in new_steps:
 			Step.objects.create(protocol=protocol, **step)
 		return protocol

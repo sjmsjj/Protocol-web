@@ -7,7 +7,7 @@ class Protocol(models.Model):
 		return 'Protocol: %s' % self.name
 
 class Step(models.Model):
-	protocol = models.ForeignKey(Protocol, primary_key=True, on_delete=models.CASCADE)
+	protocol = models.ForeignKey(Protocol, primary_key=True, related_name='steps', on_delete=models.CASCADE)
 	name = models.CharField(max_length=100, primary_key=True)
 	day = models.IntegerField()
 	detail = models.TextField()

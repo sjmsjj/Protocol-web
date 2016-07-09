@@ -23,19 +23,6 @@ import datetime
 from models import Protocol, Experiment, Step
 from serializers import StepSerializer, ProtocolSerializer
 
-class SaveProtocolAPIView(APIView):
-	def post(self, request, *args, **kwargs):
-		serializer = ProtocolSerializer(data=request.data)
-		if serializer.is_valid():
-			serializer.save()
-			return HttpResponse('Saved')
-		return HttpResponse('Cannot save the protocol')
-
-class ProtocolListAPIView(APIView):
-	def get(self, request, format=None):
-		protocols = Protocol.objects.all()
-		serializer = ProtocolSerializer(protocols, many=True)
-		return Response(serializer.data)
 
 class MainView(View):
 	def get(self, request, *args, **kwargs):
@@ -54,3 +41,27 @@ class AddProtocolView(View):
 	def post(self, request, *args, **kwargs):
 		return HttpResponse("thanks")
 
+class ProtocolListView(ListView):
+	model = Protocol
+	template_name = 'protocol/protocol_list.html'
+	context_object_name = 'protocols'
+
+class ProtocolDetailView(DetailView):
+	model = Protocol
+	template_name = 'protocol/protocol_detail.html'
+	context_object_name = 'protocol'
+
+
+class SaveProtocolAPIView(APIView):
+	def post(self, request, *args, **kwargs):
+		serializer = ProtocolSerializer(data=request.data)
+		if serializer.is_valid():
+			serializer.save()
+			return HttpResponse('Saved')
+		return HttpResponse('Cannot save the protocol')
+
+class ProtocolListAPIView(APIView):
+	def get(self, request, format=None):
+		protocols = Protocol.objects.all()
+		serializer = ProtocolSerializer(protocols, many=True)
+		return Response(serializer.data)

@@ -22,10 +22,12 @@ import views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^main/$', views.MainView.as_view(), name='main'),
-    url(r'^addProtocol/$', views.AddProtocolView.as_view(), name='add_protocol'),
-    url(r'^saveProtocol/$', views.SaveProtocolAPIView.as_view(), name='save_protocol'),
-    url(r'^api/protocols/$', views.ProtocolListAPIView.as_view()),
+    url(r'^protocol/main/$', views.MainView.as_view(), name='main'),
+    url(r'^protocol/addProtocol/$', views.AddProtocolView.as_view(), name='add_protocol'),
+    url(r'^protocol/saveProtocol/$', views.SaveProtocolAPIView.as_view(), name='save_protocol'),
+    url(r'^protocol/protocols/$', views.ProtocolListView.as_view(), name='protocol_list'),
+    url(r'^protocol/(?P<protocol>.+)/$', views.ProtocolDetailView.as_view, name='protocol_detail'),
+    url(r'^protocol/api/protocols/$', views.ProtocolListAPIView.as_view(), name='api_protocol_list'),
 ]
 
 

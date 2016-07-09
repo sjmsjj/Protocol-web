@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+    Protocol List
+{% endblock page_title %}
+
+{% block main %}
+<style type="text/css">
+    table thead td{
+    	text-align: center;
+    	vertical-align: bottom;
+    }
+    table tbody td{
+    	text-align: center;
+    }
+    table tbody td+td{
+    	text-align: left;
+    }
+</style>
+
+<div class='container'>
+	<div class='row'>
+		<div class='col-md-12 text-center'>
+			<h2>All Aavailable Protocols</h2>
+		</div>
+	</div>
+
+	<div class='row'>
+    	<div class='col-md-12 table-responsive'>
+		    <table id='tbProtocols' class='table table-striped table-bordered table-hover table-condensed'>
+		        <thead>
+		        	<tr>
+		        		<td width='10%'>No.</td>
+		        		<td width='60%'5>Name</td>
+		        		<td width='30%'>Action</td>
+		        	</tr>
+		        </thead>
+
+		        <tbody>
+		        	{% for protocol in protocols %}
+			        	<tr id="{{protocol.name}}">
+			        		<td>{{forloop.counter}}</td>
+			        		<td>{{protocol.name}}</td>
+		                    <td><button>Start new experiment</button>
+		                    	<button>Edit</button>
+		                    	<button>Delete</button>
+		                    </td>
+			        	</tr>
+		        	{% endfor %}
+		        </tbody>
+		    </table>
+	    </div>
+    </div>
+</div>
+
+
+
+
+
+
+{% endblock main %}
