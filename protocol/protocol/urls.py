@@ -24,7 +24,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api/protocol/protocols/$', views.ProtocolListAPIView.as_view(), name='api_protocol_list'),
     url(r'^api/protocol/(.+)/$', views.ProtocolDetailAPIView.as_view(), name='api_protocol_detail'),
-    url(r'^protocol/main/$', views.MainView.as_view(), name='main'),
+    url(r'^protocol/$', views.MainView.as_view(), name='main'),
     url(r'^protocol/addProtocol/$', views.AddProtocolView.as_view(), name='add_protocol'),
     url(r'^protocol/saveProtocol/$', views.SaveProtocolAPIView.as_view(), name='save_protocol'),
     url(r'^protocol/protocols/$', views.ProtocolListView.as_view(), name='protocol_list'),
