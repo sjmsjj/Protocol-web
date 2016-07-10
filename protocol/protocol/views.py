@@ -24,16 +24,43 @@ from models import Protocol, Experiment, Step
 from serializers import StepSerializer, ProtocolSerializer
 
 
+
 class MainView(View):
 	def get(self, request, *args, **kwargs):
-		experiments = Experiment.objects.all()
+		ongoing_experiments = Experiment.objects.all()
+		# experiments = ongoing_experiments
+		experiments = self.get_experiments_state(ongoing_experiments)
 		params = {'experiments' : experiments,}
 		return render(request, 'protocol/main.html', params)
 
 	def post(self, request, *args, **kwargs):
 		pass
 
+	"""
+    experiments = [{protocolname:{finished_steps  :[{date:date, step:stepname}],
+                                   unfinished_steps:[{date:date, step:stepname}]}]
+    """
+	def get_experiments_state(self, ongoing_experiments):
+		today = datetime.date.today()
+		experiments = []
+		for experiment in ongoing_experiments:
+			start_date = experiment.start_date
+			steps = Protocol.objects.get(name=experiment.protocol.name).steps.all()
+			finished_steps, unfinished_steps = [], []
+			for step in steps:
+				date = start_date + datetime.timedelta(days=step.day)
+				if date <= today:
+					finished_steps.append({'date':self.format_date(date), 'step':step.name})
+				else:
+					unfinished_steps.append({'date':self.format_date(date), 'step':step.name})
+			experiments.append({experiment.protocol.name:{'finished_steps':finished_steps,
+				                                     'unfinished_steps':unfinished_steps}})
+		return experiments
 
+	def format_date(self, date):
+		return date.strftime("%d %b, %Y (%a)")
+
+            	
 class AddProtocolView(View):
 	def get(self, request, *args, **kwargs):
 		params = {}
