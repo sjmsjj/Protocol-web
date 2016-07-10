@@ -9,20 +9,46 @@
 
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.css">
 		<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-
-
 		<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+        <style type="text/css">
+
+          <style>
+   .header{position:fixed;top:0;height:50px;}
+   .content{padding-top:50px;}
+   </style></style>
 	</head>
 
-	<body>
+	<body style="height:1500px">
 		{% block header %}
-		{% endblock header %}
+		<div class='header'>
+			<nav class="navbar navbar-inverse navbar-fixed-top">
+				<div class="container">
+					<div class="navbar-header">
+						<a class="navbar-brand" href="{% url 'main' %}">Protocol</a>
+					</div>
+					<ul class="nav navbar-nav">
+						<li><a href="{% url 'main' %}">Home</a></li>
+						<li><a href="{% url 'protocol_list' %}">Available Protocols</a></li>
+						<li><a href="{% url 'add_protocol' %}">Add New Protocol</a></li>
+					</ul>
 
+					<ul class="nav navbar-nav navbar-right">
+						<li><a href="">Contact</a></li>
+						<li><a href="">About</a></li>
+
+					</ul>
+				</div>
+			</nav>
+		</div>
+		{% endblock header %}
+        
+        <div class='content'>
 		{% block main %}
 		{% endblock %}
 
 		{% block footer %}
 		{% endblock footer %}
+	    </div>
 	</body>

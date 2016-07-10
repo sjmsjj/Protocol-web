@@ -26,7 +26,8 @@ from serializers import StepSerializer, ProtocolSerializer
 
 class MainView(View):
 	def get(self, request, *args, **kwargs):
-		params = {}
+		experiments = Experiment.objects.all()
+		params = {'experiments' : experiments,}
 		return render(request, 'protocol/main.html', params)
 
 	def post(self, request, *args, **kwargs):
