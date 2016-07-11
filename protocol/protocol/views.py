@@ -27,8 +27,11 @@ from serializers import StepSerializer, ProtocolSerializer
 
 class MainView(View):
 	def get(self, request, *args, **kwargs):
-		ongoing_experiments = Experiment.objects.all()
-		# experiments = ongoing_experiments
+		order_by = request.GET.get('order_by', 'protocol')
+		if order_by == 'protocol':
+			ongoing_experiments = Experiment.objects.all()
+		elif order_by == 'start_date':
+			ongoing_experiments = Experiment.objects.all().order_by('start_date', 'protocol')
 		experiments = self.get_experiments_state(ongoing_experiments)
 		params = {'experiments' : experiments,}
 		return render(request, 'protocol/main.html', params)
