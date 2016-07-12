@@ -5,278 +5,78 @@
 {% endblock page_title %}
 
 {% block main %}
-<style type="text/css">
-    td{
-    	text-align: center;
-    }
-    thead{
-    	font-weight: bold;
-    }
-    input, textarea {
-	    border: none;
-	    width: 100%;
-	    display: block;
-	    text-align: center;
-	    -webkit-box-sizing: border-box; 
-	       -moz-box-sizing: border-box;
-	            box-sizing: border-box; 
-    }
-
-	input[type='number'] {
-		-moz-appearance:textfield;
-	}
-	input::-webkit-outer-spin-button,
-	input::-webkit-inner-spin-button {
-		-webkit-appearance: none;
-	}
-   
-   tbody > tr, textarea.form-control{
-   	    height: 100px;
-   }
-
-   td > input[type="text"], textarea {
-   	    text-align: left;
-   }
-
-   #btnAddStep{
-		position: fixed;
-		margin-right: 5%;
-		bottom: 10%;
-   }
-
-
-
-</style>
-
-
-<div class='container'>
-	<div class='row'>
-		<div class='col-md-12 text-center'>
-			<h2>Add/Edit Protocol</h2>
+ {{current_protocol_names}}
+	<div class='container'>
+		<div class='row'>
+			<div class='col-md-12 text-center'>
+				<h2>Add/Edit Protocol</h2>
+			</div>
 		</div>
-	</div>
 
-	<div class='row'>
-		<div class='col-md-6'>
-			<h4>Protocol Name:</h4>
-			<input type='text' class='form-control text-left' id='protocol' value='{{protocol_name}}'>
+		<div class='row'>
+			<div class='col-md-6'>
+				<h4>Protocol Name:</h4>
+				<input type='text' class='form-control text-left' id='protocol' value='{{protocol_name}}'>
+			</div>
 		</div>
-	</div>
 
-	<br>
+		<br>
 
-	<div class="row">
-		<div class='col-md-12'>
-			<h4>Steps: </h4>
+		<div class="row">
+			<div class='col-md-12'>
+				<h4>Steps: </h4>
+			</div>
 		</div>
-	</div>
-    <div class='row'>
-    	<div class='col-md-12 table-responsive'>
-		    <table id='tbSteps' class='table table-bordere table-hover table-condensed'>
-		        <thead>
-		        	<tr>
-		        		<td width='5%'>Step</td>
-		        		<td width='5%'>Day</td>
-		        		<td width='20%'>Short Name</td>
-		        		<td width='40%'>Detail description</td>
-		        		<td width='30%'>Note (Optional)</td>
-		        	</tr>
-		        </thead>
-
-		        <tbody>
-		        	{% if steps %}
-		        	    {% for step in steps %}
-		        	        <tr id='{{forloop.counter}}'>
-		        	        	<td>{{forloop.counter}}</td>
-		        	        	<td><input type="number" class='form-control' value='{{step.day}}'></td>
-			                    <td><input type="text" class='form-control text-left' value='{{step.name}}'></td>
-			                    <td><textarea rows='1' class='form-control text-left'>{{step.detail}}</textarea></td>
-			                    <td><textarea rows='1' class='form-control text-left'>{{step.note}}</textarea></td>
-		        	        </tr>
-		        	    {% endfor %}
-                    {% else %}
-			        	{% for i in "123" %}
-				        	<tr id="{{i}}">
-				        		<td>{{i}}</td>
-				        		<td><input type="number" class='form-control'></td>
-			                    <td><input type="text" class='form-control'></td>
-			                    <td><textarea rows='1' class='form-control'></textarea></td>
-			                    <td><textarea rows='1' class='form-control'></textarea></td>
-				        	</tr>
-			        	{% endfor %}
-			        {% endif %}
-		        </tbody>
-		    </table>
-	    </div>
-    <div>
-
-
-    <button id="btnAddStep" class="btn btn-warning navbar-btn">Add one step</button>
-
-    <div class='container'>
 	    <div class='row'>
-	    	<div class='col-md-offset-10 col-md-2'>
-	            <button id='btnAddProtocol' type="button" class="btn btn-primary btn-block">Save</button>
-	    	</div>
+	    	<div class='col-md-12 table-responsive'>
+			    <table id='tbSteps' class='table table-bordere table-hover table-condensed'>
+			        <thead>
+			        	<tr>
+			        		<td width='5%'>Step</td>
+			        		<td width='5%'>Day</td>
+			        		<td width='20%'>Short Name</td>
+			        		<td width='40%'>Detail description</td>
+			        		<td width='30%'>Note (Optional)</td>
+			        	</tr>
+			        </thead>
+
+			        <tbody>
+			        	{% if steps %}
+			        	    {% for step in steps %}
+			        	        <tr id='{{forloop.counter}}'>
+			        	        	<td>{{forloop.counter}}</td>
+			        	        	<td><input type="number" class='form-control' value='{{step.day}}'></td>
+				                    <td><input type="text" class='form-control text-left' value='{{step.name}}'></td>
+				                    <td><textarea rows='1' class='form-control text-left'>{{step.detail}}</textarea></td>
+				                    <td><textarea rows='1' class='form-control text-left'>{{step.note}}</textarea></td>
+			        	        </tr>
+			        	    {% endfor %}
+	                    {% else %}
+				        	{% for i in "123" %}
+					        	<tr id="{{i}}">
+					        		<td>{{i}}</td>
+					        		<td><input type="number" class='form-control'></td>
+				                    <td><input type="text" class='form-control'></td>
+				                    <td><textarea rows='1' class='form-control'></textarea></td>
+				                    <td><textarea rows='1' class='form-control'></textarea></td>
+					        	</tr>
+				        	{% endfor %}
+				        {% endif %}
+			        </tbody>
+			    </table>
+		    </div>
 	    </div>
+
+
+		<div class='btnGroup'>
+		    <button id="btnAddStep" class="btn btn-warning btn-block">Add Steps</button>
+			<button id='btnAddProtocol' class="btn btn-primary btn-block">Save</button>
+			<button id='btnCancelSaveProtocol' class="btn btn-block" onclick="window.location.href='{% url 'protocol_list' %}'">Cancel</button>
+			<button id="btnRedirect" style="display:none"></button>
+		</div>
 	</div>
 
-    <div class='container' style="margin-top:5px">
-	    <div class='row'>
-	    	<div class='col-md-offset-10 col-md-2'>
-	    		<button id='btnCancelAddProtocol' type="button" class="btn btn-block" onclick="window.location.href='{% url 'protocol_list' %}'">Cancel</button>
-	    	</div>
-	    </div>
-	</div>
-</div>
 
-
-<script type="text/javascript">
-var INVALID_PROTOCOL_NAME = 'protocol name cannot be empty';
-var EMPTY_INPUT = 'can not save emtpy protol';
-var INVALID_DAY_NUMBER = 'day must be integer';
-var INVALID_DAY_ORDER = 'days must be in ascending order';
-var INCOMPLETE_STEP = 'day, name and detail cannot be left empty';
-
-$(document).ready(function(){
-	$("#btnAddStep").bind("click", add_row);
-	$("#btnAddProtocol").bind("click", save_protocol);
-})
-
-function add_row(){
-	var rows = document.getElementsByTagName('tr').length;
-	$("#tbSteps tbody").append(
-        "<tr id=" + rows + ">" + 
-        "<td>" + rows + "</td>" + 
-        "<td><input type='text' class='form-control'></td>" +
-        "<td><input type='text' class='form-control'></td>" +
-        "<td><textarea rows='1' class='form-control'></textarea></td>" + 
-        "<td><textarea rows='1' class='form-control'></textarea></td>" + 
-        "</tr>"
-		);
-}
-
-function save_protocol(){
-	var protocol = document.getElementById('protocol').value;
-	if(protocol === ''){
-		alert(INVALID_PROTOCOL_NAME);
-	}
-	else{
-		var steps = document.getElementsByTagName('tr');
-		var days = []
-		var names = []
-		var details = []
-		var notes = []
-		for(var i=1; i < steps.length; i++){
-			var step = steps[i];
-			var day = step.cells[1].children[0].value;
-			var name = step.cells[2].children[0].value;
-			var detail = step.cells[3].children[0].value;
-			var note = step.cells[4].children[0].value;
-			days.push(day);
-			names.push(name);
-			details.push(detail);
-			notes.push(note);
-		}
-		var n = validate_data(days, names, details);
-		if(typeof n === typeof 'dummy'){
-			alert(n);
-		}
-		else{
-			var data = build_json_data(protocol, days, names, details, notes, n);
-			var csrftoken = getCookie('csrftoken');
-			$.ajax({
-				type: "post",
-				url: "{% url 'save_protocol' %}",
-                data: data,
-                dataType: "text",
-                contentType: 'application/json',
-                // contentType: "application/json",
-                beforeSend: function(xhr, settings){
-				    xhr.setRequestHeader('X-CSRFToken', csrftoken);
-				    // xhr.setRequestHeader( "Content-type", "application/json" );
-			    },
-			    success: function(response){
-			    	alert(response);
-			    },
-			});
-		}
-	}
-}
-
-function validate_data(days, names, details){
-	var steps = days.length;
-	var end = steps;
-	//filter the empty rows
-	for(var i = steps-1; i >= 0; i--){
-		if(days[i] === '' && names[i] === '' && details[i] === '')
-			end--;
-	}
-	if(end === 0){
-		return EMPTY_INPUT;
-	}
-	var pre;
-	for(var i = 0; i < end; i++){
-		if(days[i] === '' || names[i] === '' || details[i] === ''){
-			return INCOMPLETE_STEP;
-		}
-		if(!Number.isInteger(Number(days[i]))){
-			return INVALID_DAY_NUMBER;
-		}
-		if(i==0){
-			pre = Number(days[0]);
-		}
-		else{
-			if(Number(days[i]) <= pre){
-				return INVALID_DAY_ORDER;
-			}
-			else{
-				pre = days[i];
-			}
-		}
-	}
-	return end;
-}
-
-function build_json_data(protocol, days, names, details, notes, n){
-	var edited_protocol_name = '';
-	{% if protocol_name %}
-        edited_protocol_name = "{{protocol_name}}"
-    {% endif %}
-
-	var data;
-	var steps = [];
-	for(var i=0; i < n; i++){
-		steps.push({'day'    : days[i],
-                    'name'   : names[i],
-                    'detail' : details[i],
-                    'note'   : notes[i],
-                    });
-	}
-	data = {
-		'edited_protocol_name' : edited_protocol_name,
-		'name' : protocol,
-		'steps' : steps,
-	};
-
-
-	return JSON.stringify(data);
-}
-
-function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie != '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = jQuery.trim(cookies[i]);
-            if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-</script>
+	{% include 'protocol/dynamic/add_edit_protocol_js.html' %}
 
 {% endblock main %}

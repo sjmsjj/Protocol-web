@@ -29,7 +29,6 @@ urlpatterns = [
     url(r'^protocol/saveProtocol/$', views.SaveProtocolAPIView.as_view(), name='save_protocol'),
     url(r'^protocol/protocols/$', views.ProtocolListView.as_view(), name='protocol_list'),
     url(r'^protocol/(?P<protocol>.+)/$', views.ProtocolDetailView.as_view(), name='protocol_detail'),
-
 ]
 
 

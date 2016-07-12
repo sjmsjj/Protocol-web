@@ -13,7 +13,10 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+SETTINGS_ROOT = os.path.normpath(os.path.dirname(__file__).replace('\\', '/'))
+PROJECT_ROOT = os.path.normpath(os.path.join(SETTINGS_ROOT, '..')).replace('/settings', '')
 
 
 # Quick-start development settings - unsuitable for production
@@ -26,8 +29,6 @@ SECRET_KEY = '+ng$g5@t$bv2_1%1^1q2pw9=s))$)))e3h&u3af(8l$pyf@^&('
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -76,16 +77,6 @@ WSGI_APPLICATION = 'protocol.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'protocol',
-        'USER': 'protocol',
-        'PASSWORD': 'protocol',
-        'HOST': '',
-        'PORT': '',
-    }
-}
 
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
@@ -132,3 +123,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(PROJECT_ROOT, "static")
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+)
+

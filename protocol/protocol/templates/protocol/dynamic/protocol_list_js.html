@@ -1,0 +1,47 @@
+<script type="text/javascript">
+	var protocol_name;
+	var action;
+
+	$(document).ready(function(){
+		$(".btnStartExperiment").bind('click', start_new_experiment);
+		$(".btnDeleteProtocol").bind('click', delete_protocol);
+	})
+
+	function start_new_experiment(){
+		protocol_name = this.value;
+		action = 'start new experiment';
+		send_action_to_server(protocol_name, action)
+	}
+
+	function delete_protocol(){
+		protocol_name = this.value;
+		action = 'delete protocol';
+		var ninstance = Number(this.name);
+		var delete_protocol_confirm_message = 'Do you want to delete this protocol?';
+	    if(ninstance > 0){
+	    	delete_protocol_confirm_message = 'You have ongoing experiments with this protocol, delete the protocol will also delete all the related experiments, do you want to continue to delete this protocol?';
+	    }
+		if(confirm(delete_protocol_confirm_message)){
+			send_action_to_server(protocol_name, action);
+		}
+	}
+
+	function send_action_to_server(protocol_name, acition){
+		var csrftoken = getCookie('csrftoken');
+		$.ajax({
+			type: 'POST',
+			url:"{% url 'protocol_list' %}",
+			data: {'protocol':protocol_name, 'action':action},
+			dataType: 'text',
+			beforeSend: function(xhr, settings){
+			    xhr.setRequestHeader('X-CSRFToken', csrftoken);
+		    },
+		    success: function(response){
+		    	if(response != 'success'){
+		    		alert(response);
+		    	}
+		    },
+		});
+	}
+
+</script>

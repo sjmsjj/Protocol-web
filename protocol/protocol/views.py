@@ -71,8 +71,10 @@ class AddEditProtocolView(View):
 		if protocol_name:
 			protocol = Protocol.objects.get(name=protocol_name)
 			steps = protocol.steps.all()
+		current_protocol_names = Protocol.objects.all().values_list('name', flat=True)
 		params = {'protocol_name' : protocol_name,
 		          'steps' : steps,
+		          'current_protocol_names' : current_protocol_names,
 		          }
 		return render(request, 'protocol/add_edit_protocol.html', params)
 
@@ -155,10 +157,9 @@ class SaveProtocolAPIView(APIView):
 				new_protocol.save()
 			else:
 				serializer.save()
-			return HttpResponse('Saved')
+			return HttpResponse('success')
 		else:
 			edited_protocol[0].save()
-
 	        for experiment in experiments:
 	        	experiment.protocol = edited_protocol
 	        	experiment.save()

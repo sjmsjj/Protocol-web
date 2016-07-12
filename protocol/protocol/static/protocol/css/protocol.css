@@ -1,0 +1,172 @@
+.header{
+   position:fixed;
+   top:0;
+   height:50px;
+}
+.content{
+   padding-top:50px;
+}
+
+.navbar-inverse .navbar-brand,
+.navbar-inverse .navbar-nav > li > a {
+   color: #ffffff;
+}
+
+.navbar-inverse > a:link, 
+.navbar-inverse .navbar-nav > li > a:link {
+	   color: #ffffff;
+}
+.navbar-inverse .navbar-header > a:hover,
+.navbar-inverse .navbar-nav > li > a:hover{
+	   color: #ffcb0b;
+}
+
+.bs-wizard {margin-top: 40px;}
+
+#fbe8aa;
+/*Form Wizard*/
+.bs-wizard {
+   border-bottom: solid 1px #e0e0e0; padding: 0 0 0px 0;
+}
+.bs-wizard > .bs-wizard-step {
+   padding: 0; 
+   position: relative;
+}
+.bs-wizard > .bs-wizard-step + .bs-wizard-step {}
+.bs-wizard > .bs-wizard-step .bs-wizard-stepname {
+   color: #595959; 
+   font-size: 14px; 
+   margin-bottom: 5px;
+}
+.bs-wizard > .bs-wizard-step .bs-wizard-info {
+   color: #999; 
+   font-size: 14px; 
+   margin-bottom: 20px;
+}
+.bs-wizard > .bs-wizard-step > .bs-wizard-dot {
+   position: absolute; 
+   width: 30px; 
+   height: 30px; 
+   display: block; 
+   background: #ffe380; 
+   top: 45px; 
+   left: 50%; 
+   margin-top: -15px; 
+   margin-left: -15px; 
+   border-radius: 50%;
+} 
+.bs-wizard > .bs-wizard-step > .bs-wizard-dot:after {
+   content: ' '; 
+   width: 14px; 
+   height: 14px; 
+   background: #ffc800; 
+   border-radius: 50px; 
+   position: absolute; 
+   top: 8px; 
+   left: 8px; 
+} 
+.bs-wizard > .bs-wizard-step > .progress {
+   position: relative; 
+   border-radius: 0px; 
+   height: 8px; 
+   box-shadow: none;
+   margin: 20px 0;
+   background-color: #d1d1e0;
+}
+.bs-wizard > .bs-wizard-step > .progress > .progress-bar {
+   width:0px; 
+   box-shadow: none; 
+   background: #ffe380;
+}
+.bs-wizard > .bs-wizard-step.complete > .progress > .progress-bar {
+   width:100%;
+}
+.bs-wizard > .bs-wizard-step.active > .progress > .progress-bar {
+   width:50%;
+}
+.bs-wizard > .bs-wizard-step:first-child.active > .progress > .progress-bar {
+   width:0%;
+}
+.bs-wizard > .bs-wizard-step:last-child.active > .progress > .progress-bar {
+   width: 100%;
+}
+.bs-wizard > .bs-wizard-step.disabled > .bs-wizard-dot {
+   background-color: #d1d1e0;
+}
+.bs-wizard > .bs-wizard-step.disabled > .bs-wizard-dot:after {
+   opacity: 0;
+}
+.bs-wizard > .bs-wizard-step > .start_row {
+   left: 50%; width: 50%;
+}
+.bs-wizard > .bs-wizard-step > .end_row {
+   width: 50%;
+}
+.bs-wizard > .bs-wizard-step.complete:last-child > .progress.end { 
+   width: 50%;
+}
+.bs-wizard > .bs-wizard-step.complete:last-child > .progress.end.start_row { 
+   width: 0%;
+}
+.bs-wizard > .bs-wizard-step.disabled:last-child > .progress { 
+   width: 50%;
+}
+.bs-wizard > .bs-wizard-step.disabled:last-child > .progress.start_row { 
+   width: 0%;
+}
+.bs-wizard > .bs-wizard-step.disabled a.bs-wizard-dot{ 
+   pointer-events: none; 
+}
+
+table[id="tbProtocols"] thead td{
+   text-align: center;
+   vertical-align: bottom;
+}
+table[id="tbProtocols"] tbody td{
+   text-align: center;
+}
+table[id="tbProtocols"] tbody td+td{
+   text-align: left;
+}
+
+table[id="tbSteps"] td{
+   text-align: center;
+}
+table[id="tbSteps"] thead{
+   font-weight: bold;
+}
+input, textarea {
+   border: none;
+   width: 100%;
+   display: block;
+   text-align: center;
+   -webkit-box-sizing: border-box; 
+    -moz-box-sizing: border-box;
+         box-sizing: border-box; 
+}
+
+input[type='number'] {
+   -moz-appearance:textfield;
+}
+   input::-webkit-outer-spin-button,
+   input::-webkit-inner-spin-button {
+   -webkit-appearance: none;
+}
+
+table[id="tbSteps"] tbody > tr, textarea.form-control{
+    height: 100px;
+}
+
+td > input[type="text"], textarea {
+    text-align: left;
+}
+
+.btnGroup {
+   right: 0px;
+   bottom: 30%;
+   padding: 4px;
+   position: fixed;
+   z-index: 9999995;
+}
+
+
