@@ -6,9 +6,12 @@
 
 {% block main %}
 <style type="text/css">
-/*    li{
-    	margin: 20px;
-    }*/
+    #btnEditProtocol{
+        position: fixed;
+        margin-left: 80%;
+        bottom: 10%;
+   }
+
 </style>
 
 <div class='container'>
@@ -34,6 +37,8 @@
 		    </ol>
         </div>
     </div>
+
+    <button id="btnEditProtocol" class="btn btn-primary" onclick="window.location.href = '{% url 'add_edit_protocol' %}?protocol_name={{protocol.name}}'">Edit Protocol</button>
 </div>
 
 {% endblock main %}

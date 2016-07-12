@@ -24,7 +24,6 @@ from models import Protocol, Experiment, Step
 from serializers import StepSerializer, ProtocolSerializer
 
 
-
 class MainView(View):
 	def get(self, request, *args, **kwargs):
 		order_by = request.GET.get('order_by', 'protocol')
@@ -64,10 +63,18 @@ class MainView(View):
 		return date.strftime("%d %b, %Y (%a)")
 
             	
-class AddProtocolView(View):
+class AddEditProtocolView(View):
 	def get(self, request, *args, **kwargs):
-		params = {}
-		return render(request, 'protocol/add_protocol.html', params)
+		protocol_name = request.GET.get('protocol_name', '')
+		protocol = None
+		steps = []
+		if protocol_name:
+			protocol = Protocol.objects.get(name=protocol_name)
+			steps = protocol.steps.all()
+		params = {'protocol_name' : protocol_name,
+		          'steps' : steps,
+		          }
+		return render(request, 'protocol/add_edit_protocol.html', params)
 
 	def post(self, request, *args, **kwargs):
 		return HttpResponse("thanks")
@@ -122,14 +129,40 @@ class ProtocolDetailView(DetailView):
 		         }
 		return render(request, 'protocol/protocol_detail.html', params)
 
-
+# the following save/edit code needs to be optimized
 class SaveProtocolAPIView(APIView):
 	def post(self, request, *args, **kwargs):
+		edited_protocol_name = request.data.pop('edited_protocol_name')
+		new_protocol_name = request.data.get('name')
+		edited_protocol = []
+		experiments = []
+		if edited_protocol_name:
+			edited_protocol = Protocol.objects.get(name=edited_protocol_name)
+			for experiment in edited_protocol.experiments.all():
+				experiments.append(experiment)
+			edited_protocol = [edited_protocol]
+			Protocol.objects.get(name=edited_protocol_name).delete()
+
 		serializer = ProtocolSerializer(data=request.data)
 		if serializer.is_valid():
-			serializer.save()
+			if edited_protocol:
+				serializer.save()
+				new_protocol = Protocol.objects.get(name=new_protocol_name)
+				for experiment in experiments:
+					experiment.protocol = new_protocol
+					experiment.save()
+				new_protocol.ninstance = len(experiments)
+				new_protocol.save()
+			else:
+				serializer.save()
 			return HttpResponse('Saved')
-		return HttpResponse('Cannot save the protocol')
+		else:
+			edited_protocol[0].save()
+
+	        for experiment in experiments:
+	        	experiment.protocol = edited_protocol
+	        	experiment.save()
+	        return HttpResponse('Cannot save the protocol')
 
 class ProtocolListAPIView(APIView):
 	def get(self, request, format=None):

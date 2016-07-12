@@ -13,39 +13,46 @@
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 
-		<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
-  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-        <style type="text/css">
 
-          <style>
+        <style type="text/css">
    .header{position:fixed;top:0;height:50px;}
    .content{padding-top:50px;}
-   </style></style>
+  
+   .navbar-inverse .navbar-brand,
+   .navbar-inverse .navbar-nav > li > a {
+	   color: #ffffff;
+   }
+
+   .navbar-inverse > a:link, 
+   .navbar-inverse .navbar-nav > li > a:link {
+   	   color: #ffffff;
+   }
+   .navbar-inverse .navbar-header > a:hover,
+   .navbar-inverse .navbar-nav > li > a:hover{
+   	   color: #ffcb0b;
+   }
+
+   </style>
 	</head>
 
-	<body style="height:1500px">
+
+
+	<body style="height:2000px">
 		{% block header %}
-		<div class='header'>
-			<nav class="navbar navbar-inverse navbar-fixed-top">
-				<div class="container">
-					<div class="navbar-header">
-						<a class="navbar-brand" href="{% url 'main' %}">Protocol</a>
-					</div>
-					<ul class="nav navbar-nav">
-						<li><a href="{% url 'main' %}">Home</a></li>
-						<li><a href="{% url 'protocol_list' %}">Available Protocols</a></li>
-						<li><a href="{% url 'add_protocol' %}">Add New Protocol</a></li>
-					</ul>
+		<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" style="background:#00274c;">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="{% url 'main' %}">Protocol</a>
+	</div>
+	<ul class="nav navbar-nav navbar-left">
+		<li><a href="{% url 'main' %}"><span class="glyphicon glyphicon-flash"></span>  Experiment</a></li>
 
-					<ul class="nav navbar-nav navbar-right">
-						<li><a href="">Contact</a></li>
-						<li><a href="">About</a></li>
+		<li><a href="{% url 'protocol_list' %}"><span class="glyphicon glyphicon-list-alt"></span> Protocol List</a></li>
 
-					</ul>
-				</div>
-			</nav>
-		</div>
+		<li><a href="{% url 'add_edit_protocol' %}"><span class="glyphicon glyphicon-pencil"></span> Add/Edit Protocol</a></li>
+	</ul>
+</nav>
+
+
 		{% endblock header %}
         
         <div class='content'>
