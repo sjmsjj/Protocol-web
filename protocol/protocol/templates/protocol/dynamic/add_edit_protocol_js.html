@@ -15,10 +15,30 @@
 		$("#btnRedirect").bind("click", redirect_to_protocol_detail);
 	})
 
-	function validate_new_protocol_name{
+	function validate_new_protocol_name() {
 		var repeated_name = false;
-		var new_name = $("protol").val();
-		
+		var new_name = $("#protocol").val();
+		var edited_protocol_name = "{{protocol_name}}";
+		if(edited_protocol_name === new_name){
+			repeated_name = false;
+		}
+		else{
+			{% for name in current_protocol_names %}
+                if(new_name === "{{name}}"){
+                	repeated_name = true;
+                }
+			{% endfor %}
+		}
+		if(repeated_name){
+			validate_new_protocol_name = false;
+			$(".error_msg").removeClass("hidden");
+
+		}
+		if(!repeated_name){
+			validate_new_protocol_name = true;
+			$(".error_msg").addClass("hidden");
+		}
+
 
 	}
 
@@ -36,55 +56,57 @@
 	}
 
 	function save_protocol(){
-		var protocol = document.getElementById('protocol').value;
-		if(protocol === ''){
-			alert(INVALID_PROTOCOL_NAME);
-		}
-		else{
-			var steps = document.getElementsByTagName('tr');
-			var days = []
-			var names = []
-			var details = []
-			var notes = []
-			for(var i=1; i < steps.length; i++){
-				var step = steps[i];
-				var day = step.cells[1].children[0].value;
-				var name = step.cells[2].children[0].value;
-				var detail = step.cells[3].children[0].value;
-				var note = step.cells[4].children[0].value;
-				days.push(day);
-				names.push(name);
-				details.push(detail);
-				notes.push(note);
-			}
-			var n = validate_data(days, names, details);
-			if(typeof n === typeof 'dummy'){
-				alert(n);
+		if(validate_new_protocol_name){
+			var protocol = document.getElementById('protocol').value;
+			if(protocol === ''){
+				alert(INVALID_PROTOCOL_NAME);
 			}
 			else{
-				var data = build_json_data(protocol, days, names, details, notes, n);
-				var csrftoken = getCookie('csrftoken');
-				$.ajax({
-					type: "post",
-					url: "{% url 'save_protocol' %}",
-	                data: data,
-	                dataType: "text",
-	                contentType: 'application/json',
-	                // contentType: "application/json",
-	                beforeSend: function(xhr, settings){
-					    xhr.setRequestHeader('X-CSRFToken', csrftoken);
-					    // xhr.setRequestHeader( "Content-type", "application/json" );
-				    },
-				    success: function(response){
-				    	if(response === "success"){
-				    		// alert('h');
-				    		$("#btnRedirect").trigger("click");
-				    	}
-				    	else{
-					    	alert(response);
-				    	}
-				    },
-				});
+				var steps = document.getElementsByTagName('tr');
+				var days = []
+				var names = []
+				var details = []
+				var notes = []
+				for(var i=1; i < steps.length; i++){
+					var step = steps[i];
+					var day = step.cells[1].children[0].value;
+					var name = step.cells[2].children[0].value;
+					var detail = step.cells[3].children[0].value;
+					var note = step.cells[4].children[0].value;
+					days.push(day);
+					names.push(name);
+					details.push(detail);
+					notes.push(note);
+				}
+				var n = validate_data(days, names, details);
+				if(typeof n === typeof 'dummy'){
+					alert(n);
+				}
+				else{
+					var data = build_json_data(protocol, days, names, details, notes, n);
+					var csrftoken = getCookie('csrftoken');
+					$.ajax({
+						type: "post",
+						url: "{% url 'save_protocol' %}",
+		                data: data,
+		                dataType: "text",
+		                contentType: 'application/json',
+		                // contentType: "application/json",
+		                beforeSend: function(xhr, settings){
+						    xhr.setRequestHeader('X-CSRFToken', csrftoken);
+						    // xhr.setRequestHeader( "Content-type", "application/json" );
+					    },
+					    success: function(response){
+					    	if(response === "success"){
+					    		// alert('h');
+					    		$("#btnRedirect").trigger("click");
+					    	}
+					    	else{
+						    	alert(response);
+					    	}
+					    },
+					});
+				}
 			}
 		}
 	}

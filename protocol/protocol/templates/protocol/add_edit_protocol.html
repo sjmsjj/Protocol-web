@@ -5,7 +5,6 @@
 {% endblock page_title %}
 
 {% block main %}
- {{current_protocol_names}}
 	<div class='container'>
 		<div class='row'>
 			<div class='col-md-12 text-center'>
@@ -17,6 +16,7 @@
 			<div class='col-md-6'>
 				<h4>Protocol Name:</h4>
 				<input type='text' class='form-control text-left' id='protocol' value='{{protocol_name}}'>
+				<label class="error_msg hidden">Protocol with the same name already exists, please try another one.</label>
 			</div>
 		</div>
 

@@ -1,3 +1,11 @@
+.error_msg {
+   color:red;
+}
+
+.hidden {
+   visibility: hidden;
+}
+
 .header{
    position:fixed;
    top:0;
