@@ -30,12 +30,12 @@
 			{% endfor %}
 		}
 		if(repeated_name){
-			validate_new_protocol_name = false;
+			valid_new_protocol_name = false;
 			$(".error_msg").removeClass("hidden");
 
 		}
 		if(!repeated_name){
-			validate_new_protocol_name = true;
+			valid_new_protocol_name = true;
 			$(".error_msg").addClass("hidden");
 		}
 
@@ -56,7 +56,7 @@
 	}
 
 	function save_protocol(){
-		if(validate_new_protocol_name){
+		if(valid_new_protocol_name){
 			var protocol = document.getElementById('protocol').value;
 			if(protocol === ''){
 				alert(INVALID_PROTOCOL_NAME);
