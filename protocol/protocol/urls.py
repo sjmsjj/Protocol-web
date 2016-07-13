@@ -17,13 +17,26 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 from rest_framework.urlpatterns import format_suffix_patterns
+from django.core.urlresolvers import reverse_lazy
+from django.views.generic import RedirectView
+
+import django.contrib.auth.views as auth_views
 
 import views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^$', RedirectView.as_view(url=reverse_lazy('protocol_login'), permanent=True),  name='protocol_root'),
+    url(r'^protocol/login/$', auth_views.login, {'template_name':'protocol/protocol_login.html'}, name='protocol_login'),
+    url(r'^protocol/logout/$', auth_views.logout_then_login, {'login_url':reverse_lazy('where')}, name='protocol_logout'),
+]
+
+urlpatterns += [
     url(r'^api/protocol/protocols/$', views.ProtocolListAPIView.as_view(), name='api_protocol_list'),
     url(r'^api/protocol/(.+)/$', views.ProtocolDetailAPIView.as_view(), name='api_protocol_detail'),
+]
+
+urlpatterns += [
     url(r'^protocol/$', views.MainView.as_view(), name='main'),
     url(r'^protocol/addEditProtocol/$', views.AddEditProtocolView.as_view(), name='add_edit_protocol'),
     url(r'^protocol/saveProtocol/$', views.SaveProtocolAPIView.as_view(), name='save_protocol'),
