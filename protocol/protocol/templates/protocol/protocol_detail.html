@@ -5,11 +5,6 @@
 {% endblock page_title %}
 
 {% block main %}
-<style type="text/css">
-/*    li{
-    	margin: 20px;
-    }*/
-</style>
 
 <div class='container'>
     <div class='row'>
@@ -34,6 +29,11 @@
 		    </ol>
         </div>
     </div>
+
+    <div class="btnGroup">
+        <button id="btnEditProtocol" class="btn btn-success btn-block" onclick="window.location.href = '{% url 'add_edit_protocol' %}?protocol_name={{protocol.name}}'">Edit Protocol</button>
+    </div>
+
 </div>
 
 {% endblock main %}

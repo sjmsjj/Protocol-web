@@ -26,18 +26,57 @@ from serializers import StepSerializer, ProtocolSerializer
 
 class MainView(View):
 	def get(self, request, *args, **kwargs):
-		experiments = Experiment.objects.all()
+		order_by = request.GET.get('order_by', 'protocol')
+		if order_by == 'protocol':
+			ongoing_experiments = Experiment.objects.all()
+		elif order_by == 'start_date':
+			ongoing_experiments = Experiment.objects.all().order_by('start_date', 'protocol')
+		experiments = self.get_experiments_state(ongoing_experiments)
 		params = {'experiments' : experiments,}
 		return render(request, 'protocol/main.html', params)
 
 	def post(self, request, *args, **kwargs):
 		pass
 
+	"""
+    experiments = [{protocolname:{finished_steps  :[{date:date, step:stepname}],
+                                   unfinished_steps:[{date:date, step:stepname}]}]
+    """
+	def get_experiments_state(self, ongoing_experiments):
+		today = datetime.date.today()
+		experiments = []
+		for experiment in ongoing_experiments:
+			start_date = experiment.start_date
+			steps = Protocol.objects.get(name=experiment.protocol.name).steps.all()
+			finished_steps, unfinished_steps = [], []
+			for step in steps:
+				date = start_date + datetime.timedelta(days=step.day)
+				if date <= today:
+					finished_steps.append({'date':self.format_date(date), 'step':step.name})
+				else:
+					unfinished_steps.append({'date':self.format_date(date), 'step':step.name})
+			experiments.append({experiment.protocol.name:{'finished_steps':finished_steps,
+				                                     'unfinished_steps':unfinished_steps}})
+		return experiments
 
-class AddProtocolView(View):
+	def format_date(self, date):
+		return date.strftime("%d %b, %Y (%a)")
+
+            	
+class AddEditProtocolView(View):
 	def get(self, request, *args, **kwargs):
-		params = {}
-		return render(request, 'protocol/add_protocol.html', params)
+		protocol_name = request.GET.get('protocol_name', '')
+		protocol = None
+		steps = []
+		if protocol_name:
+			protocol = Protocol.objects.get(name=protocol_name)
+			steps = protocol.steps.all()
+		current_protocol_names = Protocol.objects.all().values_list('name', flat=True)
+		params = {'protocol_name' : protocol_name,
+		          'steps' : steps,
+		          'current_protocol_names' : current_protocol_names,
+		          }
+		return render(request, 'protocol/add_edit_protocol.html', params)
 
 	def post(self, request, *args, **kwargs):
 		return HttpResponse("thanks")
@@ -92,14 +131,39 @@ class ProtocolDetailView(DetailView):
 		         }
 		return render(request, 'protocol/protocol_detail.html', params)
 
-
+# the following save/edit code needs to be optimized
 class SaveProtocolAPIView(APIView):
 	def post(self, request, *args, **kwargs):
+		edited_protocol_name = request.data.pop('edited_protocol_name')
+		new_protocol_name = request.data.get('name')
+		edited_protocol = []
+		experiments = []
+		if edited_protocol_name:
+			edited_protocol = Protocol.objects.get(name=edited_protocol_name)
+			for experiment in edited_protocol.experiments.all():
+				experiments.append(experiment)
+			edited_protocol = [edited_protocol]
+			Protocol.objects.get(name=edited_protocol_name).delete()
+
 		serializer = ProtocolSerializer(data=request.data)
 		if serializer.is_valid():
-			serializer.save()
-			return HttpResponse('Saved')
-		return HttpResponse('Cannot save the protocol')
+			if edited_protocol:
+				serializer.save()
+				new_protocol = Protocol.objects.get(name=new_protocol_name)
+				for experiment in experiments:
+					experiment.protocol = new_protocol
+					experiment.save()
+				new_protocol.ninstance = len(experiments)
+				new_protocol.save()
+			else:
+				serializer.save()
+			return HttpResponse('success')
+		else:
+			edited_protocol[0].save()
+	        for experiment in experiments:
+	        	experiment.protocol = edited_protocol
+	        	experiment.save()
+	        return HttpResponse('Cannot save the protocol')
 
 class ProtocolListAPIView(APIView):
 	def get(self, request, format=None):

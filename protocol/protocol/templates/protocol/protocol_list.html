@@ -1,8 +1,5 @@
 {% extends 'base.html' %}
 
-{% block wrapper-class %}{{block.super}} container app{% endblock wrapper-class %}
-
-
 {% block page_title %}
     Protocol List
 {% endblock page_title %}
@@ -10,122 +7,72 @@
 {% load protocol_tags %}
 
 {% block main %}
-<style type="text/css">
-    table thead td{
-    	text-align: center;
-    	vertical-align: bottom;
-    }
-    table tbody td{
-    	text-align: center;
-    }
-    table tbody td+td{
-    	text-align: left;
-    }
-</style>
-
-<div class='container'>
-	<div class='row'>
-		<div class='col-md-12 text-center'>
-			<h2>All Aavailable Protocols</h2>
+	<div class='container'>
+		<div class='row'>
+			<div class='col-md-12 text-center'>
+				<h2>All Available Protocols</h2>
+			</div>
 		</div>
+
+		<div class='row'>
+	    	<div class='col-md-12 table-responsive'>
+			    <table id='tbProtocols' class='table table-striped table-bordere table-hover table-condensed'>
+			        <thead>
+			        	<tr>
+			        		<td width='10%'>No.</td>
+			        		<td width='58%'5>Name</td>
+			        		<td width='42%'>Action</td>
+			        	</tr>
+			        </thead>
+
+			        <tbody>
+			        	{% for protocol in protocols %}
+				        	<tr id="{{protocol.name}}">
+				        		<td style="vertical-align:middle">{{forloop.counter}}</td>
+
+				        		<td style="vertical-align:middle">
+				        			<a style="font-size: 16px" href="{% url 'protocol_detail' protocol=protocol.name %}">{{protocol.name}}</a>
+				        		</td>
+
+			                    <td>
+			                    	<button class='btnStartExperiment btn btn-primary' value='{{protocol.name}}'>Quick Start</button>
+			                    	<button id="btnEditProtocol" class="btn btn-success" onclick="window.location.href = '{% url 'add_edit_protocol' %}?protocol_name={{protocol.name}}'">Edit Protocol</button>
+			                    	<button class="btnDeleteProtocol btn btn-warning" value='{{protocol.name}}' name='{{protocol.ninstance}}'>Delete Protocol</button>
+			                    </td>
+				        	</tr>
+			        	{% endfor %}
+			        </tbody>
+			    </table>
+		    </div>
+	    </div>
+
+        <button style="display:none" id="btnNewExperimentSuceess" data-toggle="modal" data-target="#myModal"></button>
+		<div class="modal fade" id="myModal" role="dialog">
+			<div class="modal-dialog">
+			<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+			            <button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Success</h4>
+						</div>
+						<div class="modal-body">
+							<p id="modalContent"></p>
+						</div>
+						<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+
+
+
+
+
 	</div>
 
-	<div class='row'>
-    	<div class='col-md-12 table-responsive'>
-		    <table id='tbProtocols' class='table table-striped table-bordered table-hover table-condensed'>
-		        <thead>
-		        	<tr>
-		        		<td width='10%'>No.</td>
-		        		<td width='60%'5>Name</td>
-		        		<td width='30%'>Action</td>
-		        	</tr>
-		        </thead>
-
-		        <tbody>
-		        	{% for protocol in protocols %}
-			        	<tr id="{{protocol.name}}">
-			        		<td>{{forloop.counter}}</td>
-
-			        		<td>
-			        			<a href="{% url 'protocol_detail' protocol=protocol.name %}">{{protocol.name}}</a>
-			        		</td>
-
-		                    <td>
-		                    	<button class='btnStartExperiment' value='{{protocol.name}}'>Start new experiment</button>
-		                    	<button class='btnEditProtocol' value='{{protocol.name}}'>Edit</button>
-		                    	<button class='btnDeleteProtocol' value='{{protocol.name}}' name='{{protocol.ninstance}}'>Delete</button>
-		                    </td>
-			        	</tr>
-		        	{% endfor %}
-		        </tbody>
-		    </table>
-	    </div>
-    </div>
-</div>
-
-<script type="text/javascript">
-var protocol_name;
-var action;
-
-$(document).ready(function(){
-	$(".btnStartExperiment").bind('click', start_new_experiment);
-	$(".btnDeleteProtocol").bind('click', delete_protocol);
-})
-
-function start_new_experiment(){
-	protocol_name = this.value;
-	action = 'start new experiment';
-	send_action_to_server(protocol_name, action)
-}
-
-function delete_protocol(){
-	protocol_name = this.value;
-	action = 'delete protocol';
-	var ninstance = Number(this.name);
-	var delete_protocol_confirm_message = 'Do you want to delete this protocol?';
-    if(ninstance > 0){
-    	delete_protocol_confirm_message = 'You have on going experiments with this protocol, delete the protocol will also delete all the related experiments, do you want to continue to delete this protocol?';
-    }
-	if(confirm(delete_protocol_confirm_message)){
-		send_action_to_server(protocol_name, action);
-	}
-}
-
-function send_action_to_server(protcol_name, acition){
-	var csrftoken = getCookie('csrftoken');
-	$.ajax({
-		type: 'POST',
-		url:"{% url 'protocol_list' %}",
-		data: {'protocol':protocol_name, 'action':action},
-		dataType: 'text',
-		beforeSend: function(xhr, settings){
-		    xhr.setRequestHeader('X-CSRFToken', csrftoken);
-	    },
-	    success: function(response){
-	    	if(response != 'success'){
-	    		alert(response);
-	    	}
-	    },
-	});
-}
-
-function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie != '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = jQuery.trim(cookies[i]);
-            if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-</script>
-
-
-
+	{% include  'protocol/dynamic/protocol_list_js.html' %}
 
 {% endblock main %}

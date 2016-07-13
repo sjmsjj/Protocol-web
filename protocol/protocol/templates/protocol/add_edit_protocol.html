@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+	Add New Protocol
+{% endblock page_title %}
+
+{% block main %}
+	<div class='container'>
+		<div class='row'>
+			<div class='col-md-12 text-center'>
+				<h2>Add/Edit Protocol</h2>
+			</div>
+		</div>
+
+		<div class='row'>
+			<div class='col-md-6'>
+				<h4>Protocol Name:</h4>
+				<input type='text' class='form-control text-left' id='protocol' value='{{protocol_name}}'>
+				<label class="error_msg hidden">Protocol with the same name already exists, please try another one.</label>
+			</div>
+		</div>
+
+		<br>
+
+		<div class="row">
+			<div class='col-md-12'>
+				<h4>Steps: </h4>
+			</div>
+		</div>
+	    <div class='row'>
+	    	<div class='col-md-12 table-responsive'>
+			    <table id='tbSteps' class='table table-bordere table-hover table-condensed'>
+			        <thead>
+			        	<tr>
+			        		<td width='5%'>Step</td>
+			        		<td width='5%'>Day</td>
+			        		<td width='20%'>Short Name</td>
+			        		<td width='40%'>Detail description</td>
+			        		<td width='30%'>Note (Optional)</td>
+			        	</tr>
+			        </thead>
+
+			        <tbody>
+			        	{% if steps %}
+			        	    {% for step in steps %}
+			        	        <tr id='{{forloop.counter}}'>
+			        	        	<td>{{forloop.counter}}</td>
+			        	        	<td><input type="number" class='form-control' value='{{step.day}}'></td>
+				                    <td><input type="text" class='form-control text-left' value='{{step.name}}'></td>
+				                    <td><textarea rows='1' class='form-control text-left'>{{step.detail}}</textarea></td>
+				                    <td><textarea rows='1' class='form-control text-left'>{{step.note}}</textarea></td>
+			        	        </tr>
+			        	    {% endfor %}
+	                    {% else %}
+				        	{% for i in "123" %}
+					        	<tr id="{{i}}">
+					        		<td>{{i}}</td>
+					        		<td><input type="number" class='form-control'></td>
+				                    <td><input type="text" class='form-control'></td>
+				                    <td><textarea rows='1' class='form-control'></textarea></td>
+				                    <td><textarea rows='1' class='form-control'></textarea></td>
+					        	</tr>
+				        	{% endfor %}
+				        {% endif %}
+			        </tbody>
+			    </table>
+		    </div>
+	    </div>
+
+
+		<div class='btnGroup'>
+			<button id='btnCancelSaveProtocol' class="btn btn-block" onclick="window.location.href='{% url 'protocol_list' %}'">Cancel</button>
+			<button id='btnAddProtocol' class="btn btn-primary btn-block">Save</button>
+		    <button id="btnAddStep" class="btn btn-warning btn-block">Add Steps</button>
+			<button id="btnRedirect" style="display:none"></button>
+		</div>
+	</div>
+
+
+	{% include 'protocol/dynamic/add_edit_protocol_js.html' %}
+
+{% endblock main %}

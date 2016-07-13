@@ -1,0 +1,185 @@
+<script type="text/javascript">
+	var INVALID_PROTOCOL_NAME = 'protocol name cannot be empty';
+	var EMPTY_INPUT = 'can not save emtpy protol';
+	var INVALID_DAY_NUMBER = 'day must be integer';
+	var INVALID_DAY_ORDER = 'days must be in ascending order';
+	var INCOMPLETE_STEP = 'day, name and detail cannot be left empty';
+
+	var valid_new_protocol_name = true;
+
+	$(document).ready(function(){
+        $("#protocol").bind("blur", validate_new_protocol_name);
+		$("#btnAddStep").bind("click", add_row);
+		$("#btnAddProtocol").bind("click", save_protocol);
+		$("#btnCancelSaveProtocol").bind("click", cancel_save_protocol);
+		$("#btnRedirect").bind("click", redirect_to_protocol_detail);
+	})
+
+	function validate_new_protocol_name() {
+		var repeated_name = false;
+		var new_name = $("#protocol").val();
+		var edited_protocol_name = "{{protocol_name}}";
+		if(edited_protocol_name === new_name){
+			repeated_name = false;
+		}
+		else{
+			{% for name in current_protocol_names %}
+                if(new_name === "{{name}}"){
+                	repeated_name = true;
+                }
+			{% endfor %}
+		}
+		if(repeated_name){
+			validate_new_protocol_name = false;
+			$(".error_msg").removeClass("hidden");
+
+		}
+		if(!repeated_name){
+			validate_new_protocol_name = true;
+			$(".error_msg").addClass("hidden");
+		}
+
+
+	}
+
+	function add_row(){
+		var rows = document.getElementsByTagName('tr').length;
+		$("#tbSteps tbody").append(
+	        "<tr id=" + rows + ">" + 
+	        "<td>" + rows + "</td>" + 
+	        "<td><input type='text' class='form-control'></td>" +
+	        "<td><input type='text' class='form-control'></td>" +
+	        "<td><textarea rows='1' class='form-control'></textarea></td>" + 
+	        "<td><textarea rows='1' class='form-control'></textarea></td>" + 
+	        "</tr>"
+			);
+	}
+
+	function save_protocol(){
+		if(validate_new_protocol_name){
+			var protocol = document.getElementById('protocol').value;
+			if(protocol === ''){
+				alert(INVALID_PROTOCOL_NAME);
+			}
+			else{
+				var steps = document.getElementsByTagName('tr');
+				var days = []
+				var names = []
+				var details = []
+				var notes = []
+				for(var i=1; i < steps.length; i++){
+					var step = steps[i];
+					var day = step.cells[1].children[0].value;
+					var name = step.cells[2].children[0].value;
+					var detail = step.cells[3].children[0].value;
+					var note = step.cells[4].children[0].value;
+					days.push(day);
+					names.push(name);
+					details.push(detail);
+					notes.push(note);
+				}
+				var n = validate_data(days, names, details);
+				if(typeof n === typeof 'dummy'){
+					alert(n);
+				}
+				else{
+					var data = build_json_data(protocol, days, names, details, notes, n);
+					var csrftoken = getCookie('csrftoken');
+					$.ajax({
+						type: "post",
+						url: "{% url 'save_protocol' %}",
+		                data: data,
+		                dataType: "text",
+		                contentType: 'application/json',
+		                // contentType: "application/json",
+		                beforeSend: function(xhr, settings){
+						    xhr.setRequestHeader('X-CSRFToken', csrftoken);
+						    // xhr.setRequestHeader( "Content-type", "application/json" );
+					    },
+					    success: function(response){
+					    	if(response === "success"){
+					    		// alert('h');
+					    		$("#btnRedirect").trigger("click");
+					    	}
+					    	else{
+						    	alert(response);
+					    	}
+					    },
+					});
+				}
+			}
+		}
+	}
+
+	function cancel_save_protocol(){
+		var url = "{% url 'protocol_list' %}";
+		{% if protocol_name %}
+		url = "{% url 'protocol_detail' protocol=protocol_name %}";
+		{% endif %}
+
+		window.location.href=url;
+	}
+
+	function redirect_to_protocol_detail(){
+		var url = "/protocol/" + $("#protocol").val();
+	    window.location.href=url;
+	}
+
+	function validate_data(days, names, details){
+		var steps = days.length;
+		var end = steps;
+		//filter the empty rows
+		for(var i = steps-1; i >= 0; i--){
+			if(days[i] === '' && names[i] === '' && details[i] === '')
+				end--;
+		}
+		if(end === 0){
+			return EMPTY_INPUT;
+		}
+		var pre;
+		for(var i = 0; i < end; i++){
+			if(days[i] === '' || names[i] === '' || details[i] === ''){
+				return INCOMPLETE_STEP;
+			}
+			if(!Number.isInteger(Number(days[i]))){
+				return INVALID_DAY_NUMBER;
+			}
+			if(i==0){
+				pre = Number(days[0]);
+			}
+			else{
+				if(Number(days[i]) <= pre){
+					return INVALID_DAY_ORDER;
+				}
+				else{
+					pre = days[i];
+				}
+			}
+		}
+		return end;
+	}
+
+	function build_json_data(protocol, days, names, details, notes, n){
+		var edited_protocol_name = '';
+		{% if protocol_name %}
+	        edited_protocol_name = "{{protocol_name}}"
+	    {% endif %}
+
+		var data;
+		var steps = [];
+		for(var i=0; i < n; i++){
+			steps.push({'day'    : days[i],
+	                    'name'   : names[i],
+	                    'detail' : details[i],
+	                    'note'   : notes[i],
+	                    });
+		}
+		data = {
+			'edited_protocol_name' : edited_protocol_name,
+			'name' : protocol,
+			'steps' : steps,
+		};
+
+		return JSON.stringify(data);
+	}
+</script>
