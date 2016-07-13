@@ -21,18 +21,15 @@
 </div>
 
 <div class='container'>
-  <div class='row'>
-    <div class='col-md-offset-10 col-md-4'>
-      <div class="dropdown">
-        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Order By
-        <span class="caret"></span></button>
-        <ul class="dropdown-menu">
-          <li><a href="{% url 'main' %}?order_by=protocol">Protocol</a></li>
-          <li><a href="{% url 'main' %}?order_by=start_date">Start Date</a></li>
-        </ul>
-      </div>
-    </div>
-  </div> 
+
+  <div class="dropdown" id="orderSelection">
+    <button class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Order By
+    <span class="caret"></span></button>
+    <ul class="dropdown-menu">
+      <li><a href="{% url 'main' %}?order_by=protocol">Protocol</a></li>
+      <li><a href="{% url 'main' %}?order_by=start_date">Start Date</a></li>
+    </ul>
+  </div>
 
   <div>
     <ul>

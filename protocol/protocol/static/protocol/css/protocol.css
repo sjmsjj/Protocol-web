@@ -126,9 +126,13 @@
    pointer-events: none; 
 }
 
-table[id="tbProtocols"] thead td{
+table[id="tbProtocols"] thead td,
+table[id="tbSteps"] thead td{
+   color:#ffffff;
    text-align: center;
    vertical-align: bottom;
+   font-weight: bold;
+   background: #00274c;
 }
 table[id="tbProtocols"] tbody td{
    text-align: center;
@@ -169,9 +173,9 @@ td > input[type="text"], textarea {
     text-align: left;
 }
 
-.btnGroup {
+.btnGroup, #orderSelection {
    right: 0px;
-   bottom: 30%;
+   bottom: 40%;
    padding: 4px;
    position: fixed;
    z-index: 9999995;

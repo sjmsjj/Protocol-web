@@ -1,4 +1,6 @@
 <script type="text/javascript">
+    var START_NEW_EXPERIMENT = "start new experiment";
+    var DELETE_PROTOCOL = "delete protocol";
 	var protocol_name;
 	var action;
 
@@ -9,13 +11,13 @@
 
 	function start_new_experiment(){
 		protocol_name = this.value;
-		action = 'start new experiment';
+		action = START_NEW_EXPERIMENT;
 		send_action_to_server(protocol_name, action)
 	}
 
 	function delete_protocol(){
 		protocol_name = this.value;
-		action = 'delete protocol';
+		action = DELETE_PROTOCOL;
 		var ninstance = Number(this.name);
 		var delete_protocol_confirm_message = 'Do you want to delete this protocol?';
 	    if(ninstance > 0){
@@ -39,6 +41,16 @@
 		    success: function(response){
 		    	if(response != 'success'){
 		    		alert(response);
+		    	}
+		    	else{
+		    		if(action === DELETE_PROTOCOL){
+		    			window.location.href="{% url 'protocol_list' %}";
+		    		}
+		    		else if(action === START_NEW_EXPERIMENT){
+		    			var modal_content = "Initated new experiment following the protocol: <br><b>" + protocol_name + "</b>.";
+		    			$("#modalContent").html(modal_content);
+		    			$("#btnNewExperimentSuceess").trigger("click"); 
+		    		}
 		    	}
 		    },
 		});
