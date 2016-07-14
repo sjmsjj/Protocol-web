@@ -2,7 +2,7 @@ from django.contrib.auth.forms import UserCreationForm
 from models import ProtocolUser
 from django import forms
 from django.utils.translation import ugettext_lazy as _
-
+import datetime
 
 class RegistrationForm(UserCreationForm, forms.ModelForm):
 
@@ -30,7 +30,10 @@ class RegistrationForm(UserCreationForm, forms.ModelForm):
 		last_name = self.cleaned_data.get('last_name')
 		username = self.cleaned_data.get('username')
 		email = self.cleaned_data.get('email')
-		password = self.cleaned_data('password')
+		password = self.cleaned_data.get('password1')
+		user = ProtocolUser.objects.create_user(first_name, last_name, username, email, password)
+			                               
+		return user
 
 
 
