@@ -19,7 +19,7 @@ from django.contrib import admin
 from rest_framework.urlpatterns import format_suffix_patterns
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic import RedirectView
-
+from forms import UserAuthenticationForm
 import django.contrib.auth.views as auth_views
 
 import views
@@ -29,7 +29,7 @@ urlpatterns = [
     url(r'^whereToGo/$', views.where_to_go, name='where'),
     url(r'^$', RedirectView.as_view(url=reverse_lazy('login'), permanent=True),  name='protocol_root'),
     url(r'^protocol/registration/$', views.register, name='registration'),
-    url(r'^protocol/login/$', views.protocol_login, {'template_name':'protocol/login.html'}, name='login'),
+    url(r'^protocol/login/$', views.protocol_login, {'template_name':'protocol/login.html', 'authentication_form':UserAuthenticationForm}, name='login'),
     url(r'^protocol/logout/$', auth_views.logout_then_login, {'login_url':reverse_lazy('where')}, name='logout'),
 ]
 
