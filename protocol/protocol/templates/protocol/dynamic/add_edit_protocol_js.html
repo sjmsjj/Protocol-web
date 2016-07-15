@@ -8,6 +8,7 @@
 	var valid_new_protocol_name = true;
 
 	$(document).ready(function(){
+		highLightNavbar()
         $("#protocol").bind("blur", validate_new_protocol_name);
 		$("#btnAddStep").bind("click", add_row);
 		$("#btnAddProtocol").bind("click", save_protocol);
@@ -78,12 +79,12 @@
 					details.push(detail);
 					notes.push(note);
 				}
-				var n = validate_data(days, names, details);
-				if(typeof n === typeof 'dummy'){
-					alert(n);
+				var nsteps = validate_data(days, names, details);
+				if(typeof nsteps === typeof 'dummy'){
+					alert(nsteps);
 				}
 				else{
-					var data = build_json_data(protocol, days, names, details, notes, n);
+					var data = build_json_data(protocol, days, names, details, notes, nsteps);
 					var csrftoken = getCookie('csrftoken');
 					$.ajax({
 						type: "post",
@@ -127,17 +128,17 @@
 
 	function validate_data(days, names, details){
 		var steps = days.length;
-		var end = steps;
+		var nsteps = steps;
 		//filter the empty rows
 		for(var i = steps-1; i >= 0; i--){
 			if(days[i] === '' && names[i] === '' && details[i] === '')
-				end--;
+				nsteps--;
 		}
-		if(end === 0){
+		if(nsteps === 0){
 			return EMPTY_INPUT;
 		}
 		var pre;
-		for(var i = 0; i < end; i++){
+		for(var i = 0; i < nsteps; i++){
 			if(days[i] === '' || names[i] === '' || details[i] === ''){
 				return INCOMPLETE_STEP;
 			}
@@ -156,10 +157,10 @@
 				}
 			}
 		}
-		return end;
+		return nsteps;
 	}
 
-	function build_json_data(protocol, days, names, details, notes, n){
+	function build_json_data(protocol, days, names, details, notes, nsteps){
 		var edited_protocol_name = '';
 		{% if protocol_name %}
 	        edited_protocol_name = "{{protocol_name}}"
@@ -167,7 +168,7 @@
 
 		var data;
 		var steps = [];
-		for(var i=0; i < n; i++){
+		for(var i=0; i < nsteps; i++){
 			steps.push({'day'    : days[i],
 	                    'name'   : names[i],
 	                    'detail' : details[i],

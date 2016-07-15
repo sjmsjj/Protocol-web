@@ -3,7 +3,7 @@
 {% load protocol_tags %}
 
 {% block page_title %}
-    Main
+    Experiment
 {% endblock page_title %}
 
 {% block main %}
@@ -12,56 +12,70 @@
 /*END Form Wizard*/
 </style>
 
-<div class="container">
-  <div class='row'>
-    <div class='col-md-12 text-center'>
-      <h2>Progress of Ongoing Experiments</h2>
+  {% if not experiments %}
+    <br>
+    <br>
+    <h4 class="text-center">You current do not have ongoing experiments, you can go to protocol list to start new experiments.</h4>
+  {% else %}
+
+    <div class="container">
+
+      <div class='row'>
+        <div class='col-md-12 text-center'>
+          <h2>Progress of Ongoing Experiments</h2>
+        </div>
+      </div>
     </div>
-  </div>
+
+  <div class='container'>
+
+    <div class="dropdown" id="orderSelection">
+      <button class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Order By
+      <span class="caret"></span></button>
+      <ul class="dropdown-menu">
+        <li><a href="{% url 'main' %}?order_by=protocol">Protocol</a></li>
+        <li><a href="{% url 'main' %}?order_by=start_date">Start Date</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <ul>
+        {% for experiment in experiments %}
+          <li>
+            {% for protocol, steps in experiment.items %}
+              <h4><a href="{% url 'protocol_detail' protocol=protocol %}">{{protocol}}</a></h4>
+                <div class="row bs-wizard" style="border-bottom:0;">
+                  {% for step in steps.finished_steps %}
+                    <div class="col-md-3 bs-wizard-step complete ">
+                      <div class="text-center bs-wizard-stepname">{{step.date}}</div>
+                      <div class="progress {% identify_new_row forloop.counter %} {% identify_experiment_end steps.unfinished_steps|length %}"><div class="progress-bar"></div></div>
+                      <a href="#" class="bs-wizard-dot"></a>
+                      <div class="bs-wizard-info text-center">{{step.step}}</div>
+                    </div>
+                    {% with forloop.counter as previous_counter %} {% endwith %}
+                  {% endfor %}
+
+                  {% for step in steps.unfinished_steps %}
+                    <div class="col-md-3 bs-wizard-step disabled">
+                      <div class="text-center bs-wizard-stepname">{{step.date}}</div>
+                      <div class="progress {% identify_new_row forloop.counter steps.finished_steps|length %}"><div class="progress-bar"></div></div>
+                      <a href="#" class="bs-wizard-dot"></a>
+                      <div class="bs-wizard-info text-center">{{step.step}}</div>
+                    </div>
+                  {% endfor %}
+                </div>
+            {% endfor %}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
 </div>
 
-<div class='container'>
-
-  <div class="dropdown" id="orderSelection">
-    <button class="btn btn-block btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Order By
-    <span class="caret"></span></button>
-    <ul class="dropdown-menu">
-      <li><a href="{% url 'main' %}?order_by=protocol">Protocol</a></li>
-      <li><a href="{% url 'main' %}?order_by=start_date">Start Date</a></li>
-    </ul>
-  </div>
-
-  <div>
-    <ul>
-      {% for experiment in experiments %}
-        <li>
-          {% for protocol, steps in experiment.items %}
-            <h4><a href="{% url 'protocol_detail' protocol=protocol %}">{{protocol}}</a></h4>
-              <div class="row bs-wizard" style="border-bottom:0;">
-                {% for step in steps.finished_steps %}
-                  <div class="col-md-3 bs-wizard-step complete ">
-                    <div class="text-center bs-wizard-stepname">{{step.date}}</div>
-                    <div class="progress {% identify_new_row forloop.counter %} {% identify_experiment_end steps.unfinished_steps|length %}"><div class="progress-bar"></div></div>
-                    <a href="#" class="bs-wizard-dot"></a>
-                    <div class="bs-wizard-info text-center">{{step.step}}</div>
-                  </div>
-                  {% with forloop.counter as previous_counter %} {% endwith %}
-                {% endfor %}
-
-                {% for step in steps.unfinished_steps %}
-                  <div class="col-md-3 bs-wizard-step disabled">
-                    <div class="text-center bs-wizard-stepname">{{step.date}}</div>
-                    <div class="progress {% identify_new_row forloop.counter steps.finished_steps|length %}"><div class="progress-bar"></div></div>
-                    <a href="#" class="bs-wizard-dot"></a>
-                    <div class="bs-wizard-info text-center">{{step.step}}</div>
-                  </div>
-                {% endfor %}
-              </div>
-          {% endfor %}
-        </li>
-      {% endfor %}
-    </ul>
-  </div>
-</div>
+<script type="text/javascript">
+  $(document).ready(function(){
+      highLightNavbar();
+    })
+</script>
 
 {% endblock main %}

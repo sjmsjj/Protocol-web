@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block page_title %}
-	Add New Protocol
+	Add_edit_protocol
 {% endblock page_title %}
 
 {% block main %}
@@ -13,7 +13,7 @@
 		</div>
 
 		<div class='row'>
-			<div class='col-md-6'>
+			<div class='col-md-12'>
 				<h4>Protocol Name:</h4>
 				<input type='text' class='form-control text-left' id='protocol' value='{{protocol_name}}'>
 				<label class="error_msg hidden">Protocol with the same name already exists, please try another one.</label>
