@@ -12,3 +12,14 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+
+function highLightNavbar(){
+    var page_titile = document.title
+    $("#" + page_titile).addClass("header-item");
+
+
+    // if(page_titile === "Protocol_List"){
+    //     $("#" + page_titile).addClass("active");
+    // }
+
+}

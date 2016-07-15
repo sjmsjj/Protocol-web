@@ -15,6 +15,11 @@
    padding-top:50px;
 }
 
+
+.logout {
+   color:#9d9d9d;
+}
+
 .navbar-inverse .navbar-brand,
 .navbar-inverse .navbar-nav > li > a {
    color: #ffffff;
@@ -24,15 +29,19 @@
 .navbar-inverse .navbar-nav > li > a:link {
 	   color: #ffffff;
 }
+
+.logout:hover, 
 .navbar-inverse .navbar-header > a:hover,
 .navbar-inverse .navbar-nav > li > a:hover{
 	   color: #ffcb0b;
 }
 
+.header-item{
+   background-color:#003566;
+}
+
 .bs-wizard {margin-top: 40px;}
 
-#fbe8aa;
-/*Form Wizard*/
 .bs-wizard {
    border-bottom: solid 1px #e0e0e0; padding: 0 0 0px 0;
 }

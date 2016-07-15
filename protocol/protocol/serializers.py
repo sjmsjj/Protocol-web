@@ -11,7 +11,7 @@ class ProtocolSerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = Protocol
-		fields = ['name', 'ninstance', 'steps']
+		fields = ['user', 'name', 'ninstance', 'steps']
 
 	def create(self, validated_data):
 		new_steps = validated_data.pop('steps')
