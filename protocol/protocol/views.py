@@ -26,6 +26,7 @@ import copy
 import re
 import itertools
 import datetime
+from django.utils import timezone
 from models import Protocol, Experiment, Step, ProtocolUser
 from serializers import StepSerializer, ProtocolSerializer
 from django.contrib.auth.forms import UserCreationForm
@@ -61,7 +62,7 @@ class MainView(View):
 		if order_by == 'protocol':
 			ongoing_experiments = user.get_experiments().order_by('protocol', 'start_date')
 		elif order_by == 'start_date':
-			ongoing_experiments = user.get_experiments.order_by('start_date', 'protocol')
+			ongoing_experiments = user.get_experiments().order_by('start_date', 'protocol')
 		experiments = self.get_experiments_state(ongoing_experiments)
 		params = {'experiments' : experiments,}
 		return render(request, 'protocol/main.html', params)
@@ -83,13 +84,14 @@ main = login_required(MainView.as_view())
 
 class AddEditProtocolView(View):
 	def get(self, request, *args, **kwargs):
+		user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
 		protocol_name = request.GET.get('protocol_name', '')
 		protocol = None
 		steps = []
 		if protocol_name:
-			protocol = Protocol.objects.get(name=protocol_name)
+			protocol = user.get_protocol(protocol_name)
 			steps = protocol.get_steps()
-		current_protocol_names = request.user.get_protocols().values_list('name', flat=True)
+		current_protocol_names = user.get_protocols().values_list('name', flat=True)
 		params = {'protocol_name' : protocol_name,
 		          'steps' : steps,
 		          'current_protocol_names' : current_protocol_names,
@@ -106,29 +108,29 @@ class ProtocolListView(ListView):
 	context_object_name = 'protocols'
 
 	def get_queryset(self):
-		user = self.request.user
+		user = ProtocolUser.objects.get(user_ptr_id=self.request.user.id)
 		return user.get_protocols()
 
 	def post(self, request, *args, **kwargs):
-		message = 'Sorry, cannot finish this task right now'
+		self.user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
+		message = 'Sorry, cannot finish this task right now, please try again later'
 		try:
 			protocol_name = request.POST.get('protocol')
+			protocol = self.user.get_protocol(protocol_name)
 			action = request.POST.get('action')
 			if action == 'start new experiment':
-				message = self.add_new_experiment(protocol_name)
+				message = self.add_new_experiment(protocol)
 			elif action == 'delete protocol':
-				message = self.delete_protocol(protocol_name)
+				message = self.delete_protocol(protocol)
 		except Exception:
 			pass
 		return HttpResponse(message)
 
-	def add_new_experiment(self, protocol_name):
+	def add_new_experiment(self, protocol):
 		message = 'success'
 		try:
-			user = self.request.user
-			protocol = Protocol.objects.get(name=protocol_name)
-			today = datetime.date.today()
-			experiment = Experiment.objects.create(user=user, start_date=today, protocol=protocol)
+			today = timezone.now()
+			experiment = Experiment.objects.create(user=self.user, start_date=today, protocol=protocol)
 			experiment.save()
 			protocol.ninstance += 1
 			protocol.save()
@@ -136,45 +138,51 @@ class ProtocolListView(ListView):
 			message = 'start new experiment %s failed' % protocol_name
 		return message
 
-	def delete_protocol(self, protocol_name):
+	def delete_protocol(self, protocol):
 		message = 'success'
 		try:
-			Protocol.objects.get(name=protocol_name).delete()
+			protocol.delete()
 		except Exception:
 			message = 'delete protocol %s failed' % protocol_name
 		return message
 
+protocol_list = login_required(ProtocolListView.as_view())
+
 class ProtocolDetailView(DetailView):
-	def get(self, request, *args, **kwargs):
+	def get(self, request, *args, **kwargs):		
+		user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
 		protocol_name = self.kwargs.get('protocol')
-		protocol = Protocol.objects.get(name=protocol_name)
+		protocol = user.get_protocol(protocol_name)
 		steps = protocol.get_steps()
 		params = {'protocol' : protocol,
 		          'steps' : steps 
 		         }
 		return render(request, 'protocol/protocol_detail.html', params)
 
+protocol_detail = login_required(ProtocolDetailView.as_view())
+
 # the following save/edit code needs to be optimized
 class SaveProtocolAPIView(APIView):
 	def post(self, request, *args, **kwargs):
-		request.data['user'] = request.user
+		user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
+		request.data['user'] = user
 		edited_protocol_name = request.data.pop('edited_protocol_name')
 		new_protocol_name = request.data.get('name')
 		edited_protocol = []
 		experiments = []
 		if edited_protocol_name:
-			edited_protocol = Protocol.objects.get(name=edited_protocol_name)
-			for experiment in edited_protocol.experiments.all():
+			edited_protocol = user.get_protocol(edited_protocol_name)
+			for experiment in edited_protocol.get_experiments():
 				experiments.append(experiment)
 			edited_protocol = [edited_protocol]
-			Protocol.objects.get(name=edited_protocol_name).delete()
+			user.get_protocol(edited_protocol_name).delete()
 
 		serializer = ProtocolSerializer(data=request.data)
 		if serializer.is_valid():
 			new_protocol = None
 			if edited_protocol:
 				serializer.save()
-				new_protocol = Protocol.objects.get(name=new_protocol_name)
+				new_protocol = user.get_protocol(new_protocol_name)
 				for experiment in experiments:
 					experiment.protocol = new_protocol
 					experiment.save()
@@ -192,18 +200,26 @@ class SaveProtocolAPIView(APIView):
 	        	experiment.save()
 	        return HttpResponse('Cannot save the protocol')
 
+save_protocol = login_required(SaveProtocolAPIView.as_view())
+
 class ProtocolListAPIView(APIView):
 	def get(self, request, format=None):
-		protocols = request.user.get_protocols()
+		user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
+		protocols = user.get_protocols()
 		serializer = ProtocolSerializer(protocols, many=True)
 		return Response(serializer.data)
 
+api_protocol_list = login_required(ProtocolListAPIView.as_view())
+
 class ProtocolDetailAPIView(APIView):
 	def get(self, request, format=None):
+		user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
 		protocol_name = self.args[0]
-		protocol = Protocol.objects.get(name=protocol_name)
+		protocol = user.get_protocol(protocol_name)
 		serializer = ProtocolSerializer([protocol], many=True)
 		return Response(serializer.data)
+
+api_protocol_detail = login_required(ProtocolDetailAPIView.as_view())
 
 class ProtocolRouterView(View):
     login_url = 'login'

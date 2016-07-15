@@ -61,6 +61,9 @@ class ProtocolUser(User):
 	def get_protocols(self):
 		return Protocol.objects.filter(user=self)
 
+	def get_protocol(self, protocol_name):
+		return self.get_protocols().get(name=protocol_name)
+
 	def get_experiments(self):
 		return Experiment.objects.filter(user=self)
 
@@ -112,9 +115,9 @@ class Step(models.Model):
 class Experiment(models.Model):
 	user = models.ForeignKey(ProtocolUser, on_delete=models.CASCADE)
 	protocol = models.ForeignKey(Protocol, related_name='experiments', on_delete=models.CASCADE)
-	start_date = models.DateField(blank=True, null=True)
+	start_date = models.DateTimeField(blank=True, null=True)
 
-	today = datetime.datetime.today()
+	today = timezone.now()
 
 	def __unicode__(self):
 		return 'Experiment started on %s following protocol %s' % (str(start_date), protocol.name)
@@ -124,9 +127,9 @@ class Experiment(models.Model):
 
 	def get_finished_steps(self):
 		finished_steps = []
-		for step in protocol.get_steps():
-			date = start_date + datetime.timedelta(days=step.day)
-			if date <= today:
+		for step in self.protocol.get_steps():
+			date = self.start_date + datetime.timedelta(days=step.day)
+			if date <= self.today:
 				finished_steps.append({'date':self.format_date(date), 'step':step.name})
 			else:
 				break
@@ -134,10 +137,10 @@ class Experiment(models.Model):
 
 	def get_unfinished_steps(self):
 		unfinished_steps = []
-		for step in protocol.get_steps():
-			date = start_date + datetime.timedelta(days=step.day)
-			if date > today:
-				finished_steps.append({'date':self.format_date(date), 'step':step.name})
+		for step in self.protocol.get_steps():
+			date = self.start_date + datetime.timedelta(days=step.day)
+			if date > self.today:
+				unfinished_steps.append({'date':self.format_date(date), 'step':step.name})
 		return unfinished_steps
 
 	def is_acitve(self):

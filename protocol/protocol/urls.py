@@ -29,21 +29,21 @@ urlpatterns = [
     url(r'^whereToGo/$', views.where_to_go, name='where'),
     url(r'^$', RedirectView.as_view(url=reverse_lazy('login'), permanent=True),  name='protocol_root'),
     url(r'^protocol/registration/$', views.register, name='registration'),
-    url(r'^protocol/login/$', views.protocol_login, {'template_name':'protocol/login.html', 'next': reverse_lazy('main')}, name='login'),
+    url(r'^protocol/login/$', views.protocol_login, {'template_name':'protocol/login.html'}, name='login'),
     url(r'^protocol/logout/$', auth_views.logout_then_login, {'login_url':reverse_lazy('where')}, name='logout'),
 ]
 
 urlpatterns += [
-    url(r'^api/protocol/protocols/$', views.ProtocolListAPIView.as_view(), name='api_protocol_list'),
-    url(r'^api/protocol/(.+)/$', views.ProtocolDetailAPIView.as_view(), name='api_protocol_detail'),
+    url(r'^api/protocol/protocols/$', views.api_protocol_list, name='api_protocol_list'),
+    url(r'^api/protocol/(.+)/$', views.api_protocol_detail, name='api_protocol_detail'),
 ]
 
 urlpatterns += [
     url(r'^protocol/$', views.main, name='main'),
     url(r'^protocol/addEditProtocol/$', views.add_edit_protocol, name='add_edit_protocol'),
-    url(r'^protocol/saveProtocol/$', views.SaveProtocolAPIView.as_view(), name='save_protocol'),
-    url(r'^protocol/protocols/$', views.ProtocolListView.as_view(), name='protocol_list'),
-    url(r'^protocol/(?P<protocol>.+)/$', views.ProtocolDetailView.as_view(), name='protocol_detail'),
+    url(r'^protocol/saveProtocol/$', views.save_protocol, name='save_protocol'),
+    url(r'^protocol/protocols/$', views.protocol_list, name='protocol_list'),
+    url(r'^protocol/(?P<protocol>.+)/$', views.protocol_detail, name='protocol_detail'),
 ]
 
 
