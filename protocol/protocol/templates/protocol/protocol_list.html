@@ -70,9 +70,54 @@
 
 				</div>
 			</div>
+
+           <br>
+           <br>
+           <br>
+			<div>
+				<h4>Start New Experiment Verbosely</h4>
+				<hr style="margin-top:10px;">
+			</div>
+
+			<div class="row">
+				<div class="col-md-5">
+					<label>Protocol: </label>
+					<div role="form">
+						<div class="form-group">
+							<select id="protocol_list" class="form-control">
+								{% for protocol in protocols %}
+									<option value="{{protocol.name}}">{{protocol.name}}</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<form role="form">
+						<div class="form-group">
+							<label for="start_date" style="display:inline-block;">Start Date: </label>
+							<input type="text" id="datepicker" class="form-control">
+						</div>
+				    </form>
+				</div>
+
+				<div class="col-md-4">
+					<form role="form">
+						<div class="form-group">
+							<label for="start_date" style="display:inline-block;">Short Note(optional): </label>
+							<input type="text" class="form-control" id="new_experiment_note">
+						</div>
+				    </form>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-offset-10 col-md-2">
+					<button id="btnStart" class='btn btn-primary btn-block'>Start New Experiment</button>
+				</div>
+			</div>
 		</div>
 	{% endif %}
 
 	{% include  'protocol/dynamic/protocol_list_js.html' %}
-
 {% endblock main %}

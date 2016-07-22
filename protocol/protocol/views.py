@@ -77,7 +77,8 @@ class MainView(View):
 			finished_steps = experiment.get_finished_steps()
 			unfinished_steps = experiment.get_unfinished_steps()
 			experiments.append({experiment.protocol.name:{'finished_steps':finished_steps,
-				                                          'unfinished_steps':unfinished_steps}})
+				                                          'unfinished_steps':unfinished_steps,
+				                                          'experiment_note': experiment.note}})
 		return experiments
     
 main = login_required(MainView.as_view())
@@ -116,21 +117,27 @@ class ProtocolListView(ListView):
 		message = 'Sorry, cannot finish this task right now, please try again later'
 		try:
 			protocol_name = request.POST.get('protocol')
-			protocol = self.user.get_protocol(protocol_name)
 			action = request.POST.get('action')
+			start_date = request.POST.get('start_date')
+			note = request.POST.get('note')
+			protocol = self.user.get_protocol(protocol_name)
 			if action == 'start new experiment':
-				message = self.add_new_experiment(protocol)
+				message = self.add_new_experiment(protocol, start_date, note)
 			elif action == 'delete protocol':
 				message = self.delete_protocol(protocol)
 		except Exception:
 			pass
 		return HttpResponse(message)
 
-	def add_new_experiment(self, protocol):
+	def add_new_experiment(self, protocol, start_date=None, note=None):
 		message = 'success'
+		start_time = timezone.now()
+		if start_date:
+			month, day, year = map(int, start_date.split('/'))
+			hour, minute = start_time.hour, start_time.minute
+			start_time = datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute)
 		try:
-			today = timezone.now()
-			experiment = Experiment.objects.create(user=self.user, start_date=today, protocol=protocol)
+			experiment = Experiment.objects.create(user=self.user, start_date=start_time, protocol=protocol, note=note)
 			experiment.save()
 			protocol.ninstance += 1
 			protocol.save()

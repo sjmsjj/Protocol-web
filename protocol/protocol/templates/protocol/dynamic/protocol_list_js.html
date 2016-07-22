@@ -6,14 +6,30 @@
 
 	$(document).ready(function(){
 		highLightNavbar();
+		initiate_datepicker();
+		$("#btnStart").bind('click', start_new_experiment_verbosely);
 		$(".btnStartExperiment").bind('click', start_new_experiment);
 		$(".btnDeleteProtocol").bind('click', delete_protocol);
 	})
 
+	function initiate_datepicker(){
+		$( "#datepicker" ).datepicker();
+	}
+
+	function start_new_experiment_verbosely(){
+		action = START_NEW_EXPERIMENT;
+		var protocols = document.getElementById("protocol_list");
+		var protocol_name = protocols[protocols.selectedIndex].value;
+		var start_date = $("#datepicker").val();
+		var note = $("#new_experiment_note").val();
+
+		send_action_to_server(protocol_name, action, start_date, note);
+	}
+
 	function start_new_experiment(){
 		protocol_name = this.value;
 		action = START_NEW_EXPERIMENT;
-		send_action_to_server(protocol_name, action)
+		send_action_to_server(protocol_name, action);
 	}
 
 	function delete_protocol(){
@@ -29,12 +45,16 @@
 		}
 	}
 
-	function send_action_to_server(protocol_name, acition){
+	function send_action_to_server(protocol_name, acition, start_date, note){
 		var csrftoken = getCookie('csrftoken');
+		if(typeof start_date === "undefined"){
+			start_date = "";
+			note = "";
+		}
 		$.ajax({
 			type: 'POST',
 			url:"{% url 'protocol_list' %}",
-			data: {'protocol':protocol_name, 'action':action},
+			data: {'protocol':protocol_name, 'action':action, 'start_date':start_date, 'note':note},
 			dataType: 'text',
 			beforeSend: function(xhr, settings){
 			    xhr.setRequestHeader('X-CSRFToken', csrftoken);

@@ -116,6 +116,7 @@ class Experiment(models.Model):
 	user = models.ForeignKey(ProtocolUser, on_delete=models.CASCADE)
 	protocol = models.ForeignKey(Protocol, related_name='experiments', on_delete=models.CASCADE)
 	start_date = models.DateTimeField(blank=True, null=True)
+	note = models.TextField(null=True, blank=True)
 
 	today = timezone.now()
 

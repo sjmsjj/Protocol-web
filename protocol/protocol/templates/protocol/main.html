@@ -44,6 +44,9 @@
           <li>
             {% for protocol, steps in experiment.items %}
               <h4><a href="{% url 'protocol_detail' protocol=protocol %}">{{protocol}}</a></h4>
+              {% if steps.experiment_note %}
+                <h5><i>{{steps.experiment_note}}</i></h5>
+              {% endif %}
                 <div class="row bs-wizard" style="border-bottom:0;">
                   {% for step in steps.finished_steps %}
                     <div class="col-md-3 bs-wizard-step complete ">
