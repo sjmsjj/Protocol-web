@@ -31,30 +31,32 @@ urlpatterns = [
     url(r'^protocol/registration/$', views.register, name='registration'),
     url(r'^protocol/login/$', views.protocol_login, {'template_name':'protocol/login.html', 'authentication_form':UserAuthenticationForm}, name='login'),
     url(r'^protocol/logout/$', auth_views.logout_then_login, {'login_url':reverse_lazy('where')}, name='logout'),
+    url(r'^protocol/userprofile/$', views.user_profile_view, name='user_profile'),
 ]
 
 urlpatterns += [
     url(r'^password_reset/$', auth_views.password_reset, {
         'template_name': 'protocol/reset_password/password_reset.html',
-        'email_template_name': 'protocol/resetpassword_reset.txt',
+        'email_template_name': 'protocol/reset_password/password_reset.txt',
         'post_reset_redirect': reverse_lazy('protocol_password_reset_sent'),
         }, name="protocol_password_reset"),
     url(r'^password_reset_confirm/(?P<uidb64>\w*)\|(?P<token>[\-a-zA-Z0-9]*)$', auth_views.password_reset_confirm, {
-        'template_name': 'protocol/password_reset_confirm.html',
+        'template_name': 'protocol/reset_password/password_reset_confirm.html',
         'post_reset_redirect': reverse_lazy('protocol_password_reset_complete'),
         }, name="protocol_password_reset_confirm"),
     url(r'^password_reset_sent/$', auth_views.password_reset_done, {
-        'template_name': 'protocol/password_reset_sent.html',
+        'template_name': 'protocol/reset_password/password_reset_sent.html',
         }, name="protocol_password_reset_sent"),
     url(r'^password_reset_complete/$', auth_views.password_reset_complete, {
-        'template_name': 'protocol/password_reset_complete.html',
+        'template_name': 'protocol/reset_password/password_reset_complete.html',
         }, name="protocol_password_reset_complete"),
     url(r'^account_confirm_retry/$', auth_views.password_reset, {
-        'template_name': 'protocol/password_reset.html',
+        'template_name': 'protocol/reset_password/password_reset.html',
         'email_template_name': 'protocol/account_password.html',
         'post_reset_redirect': reverse_lazy('protocol_password_reset_sent'),
         }, name="account_confirm_retry"),
 ]
+
 
 urlpatterns += [
     url(r'^api/protocol/protocols/$', views.api_protocol_list, name='api_protocol_list'),

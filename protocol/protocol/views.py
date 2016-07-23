@@ -1,5 +1,5 @@
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import View, TemplateView, DetailView, ListView
+from django.views.generic import View, TemplateView, DetailView, ListView, UpdateView
 from django.http import HttpResponse
 from django.shortcuts import redirect, render_to_response, get_object_or_404, render
 from django.core.urlresolvers import reverse_lazy
@@ -30,7 +30,7 @@ from django.utils import timezone
 from models import Protocol, Experiment, Step, ProtocolUser
 from serializers import StepSerializer, ProtocolSerializer
 from django.contrib.auth.forms import UserCreationForm
-from forms import RegistrationForm
+from forms import RegistrationForm, UserProfileForm
 
 class Registration(View):
 	def get(self, request, *args, **kwargs):
@@ -167,6 +167,17 @@ class ProtocolDetailView(DetailView):
 		return render(request, 'protocol/protocol_detail.html', params)
 
 protocol_detail = login_required(ProtocolDetailView.as_view())
+
+class UserProfileView(UpdateView):
+	form_class = UserProfileForm
+	template_name = 'protocol/user_profile.html'
+	success_url = reverse_lazy('main')
+
+	def get_object(self):
+		user = ProtocolUser.objects.get(user_ptr_id=self.request.user.id)
+		return user
+
+user_profile_view = UserProfileView.as_view()
 
 # the following save/edit code needs to be optimized
 class SaveProtocolAPIView(APIView):

@@ -9,6 +9,8 @@ from django.forms import ValidationError
 from django.contrib.auth import (
     authenticate, get_user_model, password_validation,
 )
+
+
 class RegistrationForm(UserCreationForm, forms.ModelForm):
 	first_name = forms.CharField(required = True)
 	last_name = forms.CharField(required = True)
@@ -80,4 +82,25 @@ class UserAuthenticationForm(AuthenticationForm):
 		            self.confirm_login_allowed(self.user_cache)
 
 	    return self.cleaned_data
-		
+
+class UserProfileForm(forms.ModelForm):
+	class Meta:
+		model = ProtocolUser
+		fields = ['username', 'first_name', 'last_name', 'email']
+
+		help_texts = {
+            'username' : '', 
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+

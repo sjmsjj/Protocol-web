@@ -41,7 +41,7 @@
 						</ul>
 
 						<ul class="nav navbar-nav navbar-right">
-							<p class="navbar-text">Welcome, <a href="#" class="navbar-link">{{user.first_name}}</a>&nbsp&nbsp&nbsp&nbsp&nbsp</p>
+							<p class="navbar-text">Welcome, <a href="{% url 'user_profile' %}" class="navbar-link">{{user.first_name}}</a>&nbsp&nbsp&nbsp&nbsp&nbsp</p>
 							<li class="header-item"><a href="{% url 'logout' %}"><span class="logout">Sign out</span></a></li>
 						</ul>
 				    </div>
