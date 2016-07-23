@@ -6,7 +6,7 @@ Examples:
 Function views
     1. Add an import:  from my_app import views
     2. Add a URL to urlpatterns:  url(r'^$', views.home, name='home')
-Class-based views
+Class_based views
     1. Add an import:  from other_app.views import Home
     2. Add a URL to urlpatterns:  url(r'^$', Home.as_view(), name='home')
 Including another URLconf
@@ -31,6 +31,29 @@ urlpatterns = [
     url(r'^protocol/registration/$', views.register, name='registration'),
     url(r'^protocol/login/$', views.protocol_login, {'template_name':'protocol/login.html', 'authentication_form':UserAuthenticationForm}, name='login'),
     url(r'^protocol/logout/$', auth_views.logout_then_login, {'login_url':reverse_lazy('where')}, name='logout'),
+]
+
+urlpatterns += [
+    url(r'^password_reset/$', auth_views.password_reset, {
+        'template_name': 'protocol/reset_password/password_reset.html',
+        'email_template_name': 'protocol/resetpassword_reset.txt',
+        'post_reset_redirect': reverse_lazy('protocol_password_reset_sent'),
+        }, name="protocol_password_reset"),
+    url(r'^password_reset_confirm/(?P<uidb64>\w*)\|(?P<token>[\-a-zA-Z0-9]*)$', auth_views.password_reset_confirm, {
+        'template_name': 'protocol/password_reset_confirm.html',
+        'post_reset_redirect': reverse_lazy('protocol_password_reset_complete'),
+        }, name="protocol_password_reset_confirm"),
+    url(r'^password_reset_sent/$', auth_views.password_reset_done, {
+        'template_name': 'protocol/password_reset_sent.html',
+        }, name="protocol_password_reset_sent"),
+    url(r'^password_reset_complete/$', auth_views.password_reset_complete, {
+        'template_name': 'protocol/password_reset_complete.html',
+        }, name="protocol_password_reset_complete"),
+    url(r'^account_confirm_retry/$', auth_views.password_reset, {
+        'template_name': 'protocol/password_reset.html',
+        'email_template_name': 'protocol/account_password.html',
+        'post_reset_redirect': reverse_lazy('protocol_password_reset_sent'),
+        }, name="account_confirm_retry"),
 ]
 
 urlpatterns += [

@@ -67,7 +67,6 @@ class UserAuthenticationForm(AuthenticationForm):
 	    email = self.cleaned_data.get('email')
 	    password = self.cleaned_data.get('password')
 
-	    user = get_user_model().objects.filter(email=email)
 	    if email and password:
 		    if not get_user_model().objects.filter(email=email):
 	        	self.add_error('email','This email has not been registered')
