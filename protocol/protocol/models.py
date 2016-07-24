@@ -68,10 +68,11 @@ class ProtocolUser(User):
 		return Experiment.objects.filter(user=self)
 
 class Protocol(models.Model):
-	user = models.ForeignKey(ProtocolUser, on_delete=models.PROTECT)
+	user = models.ForeignKey(ProtocolUser, on_delete=models.PROTECT, null=True, blank=True)
 	name = models.CharField(primary_key = True, max_length=100)
 	ninstance = models.IntegerField(default=0)
 	last_updated = models.DateTimeField(blank=True, null=True)
+	is_public = models.BooleanField(default=False)
 
 	def __unicode__(self):
 		return 'Protocol: %s' % self.name
@@ -95,6 +96,11 @@ class Protocol(models.Model):
 
 	def get_ninstances(self):
 		return self.ninstance
+
+class SharedProtocol(models.Model):
+	shared_from = models.ForeignKey(ProtocolUser, on_delete=models.CASCADE, related_name='shared_from')
+	shared_to = models.ForeignKey(ProtocolUser, on_delete=models.CASCADE, related_name='shared_to')
+	protocol = models.ForeignKey(Protocol, on_delete=models.PROTECT)
 
 class Step(models.Model):
 	protocol = models.ForeignKey(Protocol, related_name='steps', on_delete=models.CASCADE)

@@ -123,6 +123,8 @@ class ProtocolListView(ListView):
 			protocol = self.user.get_protocol(protocol_name)
 			if action == 'start new experiment':
 				message = self.add_new_experiment(protocol, start_date, note)
+			elif action == 'change protocol access level':
+				message = self.change_protocol_access_level(protocol)
 			elif action == 'delete protocol':
 				message = self.delete_protocol(protocol)
 		except Exception:
@@ -142,7 +144,19 @@ class ProtocolListView(ListView):
 			protocol.ninstance += 1
 			protocol.save()
 		except Exception:
-			message = 'start new experiment %s failed' % protocol_name
+			message = 'start new experiment %s failed, please try again later' % protocol.name
+		return message
+
+	def change_protocol_access_level(self, protocol):
+		message = 'success'
+		try:
+			if protocol.is_public:
+				protocol.is_public = False
+			else:
+				protocol.is_public = True
+			protocol.save()
+		except Exception:
+			message = 'change access level for protocol %s failed, please try again later' % protocol.name
 		return message
 
 	def delete_protocol(self, protocol):
@@ -150,7 +164,7 @@ class ProtocolListView(ListView):
 		try:
 			protocol.delete()
 		except Exception:
-			message = 'delete protocol %s failed' % protocol_name
+			message = 'delete protocol %s failed, please try again later' % protocol.name
 		return message
 
 protocol_list = login_required(ProtocolListView.as_view())

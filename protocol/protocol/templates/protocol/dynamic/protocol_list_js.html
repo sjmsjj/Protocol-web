@@ -1,6 +1,8 @@
 <script type="text/javascript">
     var START_NEW_EXPERIMENT = "start new experiment";
+    var CHANGE_PROTOCOL_ACCESS_LEVEL = "change protocol access level";
     var DELETE_PROTOCOL = "delete protocol";
+
 	var protocol_name;
 	var action;
 
@@ -9,6 +11,7 @@
 		initiate_datepicker();
 		$("#btnStart").bind('click', start_new_experiment_verbosely);
 		$(".btnStartExperiment").bind('click', start_new_experiment);
+		$(".btnChangeProcotolAccess").bind('click', change_protocol_access_level);
 		$(".btnDeleteProtocol").bind('click', delete_protocol);
 	})
 
@@ -22,13 +25,18 @@
 		var protocol_name = protocols[protocols.selectedIndex].value;
 		var start_date = $("#datepicker").val();
 		var note = $("#new_experiment_note").val();
-
 		send_action_to_server(protocol_name, action, start_date, note);
 	}
 
 	function start_new_experiment(){
 		protocol_name = this.value;
 		action = START_NEW_EXPERIMENT;
+		send_action_to_server(protocol_name, action);
+	}
+
+	function change_protocol_access_level(){
+		protocol_name = this.value;
+		action = CHANGE_PROTOCOL_ACCESS_LEVEL;
 		send_action_to_server(protocol_name, action);
 	}
 
@@ -60,21 +68,46 @@
 			    xhr.setRequestHeader('X-CSRFToken', csrftoken);
 		    },
 		    success: function(response){
-		    	if(response != 'success'){
+		    	if(response !== 'success'){
 		    		alert(response);
 		    	}
 		    	else{
-		    		if(action === DELETE_PROTOCOL){
-		    			window.location.href="{% url 'protocol_list' %}";
+		    		if(action === START_NEW_EXPERIMENT){
+		    			notify_initiate_experiment_success();
 		    		}
-		    		else if(action === START_NEW_EXPERIMENT){
-		    			var modal_content = "Initated new experiment following the protocol: <br><b>" + protocol_name + "</b>.";
-		    			$("#modalContent").html(modal_content);
-		    			$("#btnNewExperimentSuceess").trigger("click"); 
+		    		else if(action === CHANGE_PROTOCOL_ACCESS_LEVEL){
+		    			update_protocol_access_level(protocol_name);
+		    		}
+		    		else if(action === DELETE_PROTOCOL){
+		    			delete_protocol_row(protocol_name);
 		    		}
 		    	}
 		    },
 		});
+	}
+
+	function notify_initiate_experiment_success(){
+		var modal_content = "Initated new experiment following the protocol: <br><b>" + protocol_name + "</b>.";
+		$("#modalContent").html(modal_content);
+		$("#btnNewExperimentSuceess").trigger("click"); 
+	}
+
+	function update_protocol_access_level(protocol_name){
+		var row = document.getElementById(protocol_name);
+		if(row.cells[0].innerHTML === "Private"){
+			row.cells[0].innerHTML = "Public";
+			$("button[name=" + protocol_name + "]").text("Make Private");
+		}
+		else{
+			row.cells[0].innerHTML = "Private";
+			$("button[name=" + protocol_name + "]").html("Make Public&nbsp");
+		}
+	}
+
+	function delete_protocol_row(protocol_name){
+		var table = document.getElementById("tbProtocols");
+		var row = document.getElementById(protocol_name);
+		table.deleteRow(row.rowIndex);
 	}
 
 </script>
