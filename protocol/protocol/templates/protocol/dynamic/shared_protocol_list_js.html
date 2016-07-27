@@ -27,7 +27,7 @@
 	function send_action_to_server(){
 		$.ajax({
 			type: "POST",
-			url: "{% url 'accept_shared_protocol' %}",
+			url: "{% url 'process_shared_protocol' %}",
 			data: {"protocol_id": protocol_id, "action": action},
 			dataType: "text",
 			success: function(response){
