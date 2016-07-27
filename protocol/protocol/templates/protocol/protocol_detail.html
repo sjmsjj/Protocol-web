@@ -31,7 +31,9 @@
     </div>
 
     <div class="btnGroup">
-        <button id="btnEditProtocol" class="btn btn-success btn-block" onclick="window.location.href = '{% url 'add_edit_protocol' %}?protocol_name={{protocol.name}}'">Edit Protocol</button>
+    	{% if editable %}
+	        <button id="btnEditProtocol" class="btn btn-success btn-block" onclick="window.location.href = '{% url 'add_edit_protocol' %}?protocol_name={{protocol.name}}'">Edit Protocol</button>
+	    {% endif %}
     </div>
 
 </div>

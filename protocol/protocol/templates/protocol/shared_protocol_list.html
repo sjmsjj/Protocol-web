@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+    Shared_Protocol_list
+{% endblock page_title %}
+
+{% load protocol_tags %}
+
+{% block main %}
+    {% if not shared_protocols %}
+	    <br>
+	    <br>
+	    <h4 class="text-center">No one has shared protocols with you currently, you can search public protocols to look for the protocols you want.</h4>
+    {% else %}
+		<div class='container'>
+			<div class='row'>
+				<div class='col-md-12 text-center'>
+					<h2>Protocols shared with you</h2>
+				</div>
+			</div>
+
+			<div class='row'>
+		    	<div class='col-md-12 table-responsive'>
+				    <table id='tbProtocols' class='table table-striped table-hover table-condensed'>
+				        <thead>
+				        	<tr>
+				        		<td width='25%'>From</td>
+				        		<td width='60%'5>Protocol Name</td>
+				        		<td width='15%' colspan="2">Action</td>
+				        	</tr>
+				        </thead>
+
+				        <tbody>
+				        	{% for protocol in shared_protocols %}
+					        	<tr id="{{protocol.protocol_id}}">
+					        		<td style="vertical-align:middle">{{protocol.shared_from.get_full_name}}</td>
+					        		<td style="vertical-align:middle">
+					        			<a style="font-size: 16px" href="{% url 'protocol_detail' protocol=protocol.protocol_name %}?protocol_id={{protocol.protocol_id}}">{{protocol.protocol_name}}</a>
+					        		</td>
+
+				                    <td>
+				                    	<button class='btnAcceptProtocol btn btn-primary' value='{{protocol.protocol_id}}'>Accept</button>
+				                    </td>
+									<td>
+				                    	<button class="btnDeclineProtocol btn btn-warning" value='{{protocol.protocol_id}}'>Decline</button>
+				                    </td>
+					        	</tr>
+				        	{% endfor %}
+				        </tbody>
+				    </table>
+			    </div>
+		    </div>
+		</div>
+	{% endif %}
+
+	{% include  'protocol/dynamic/shared_protocol_list_js.html' %}
+{% endblock main %}

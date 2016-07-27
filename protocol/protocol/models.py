@@ -62,14 +62,24 @@ class ProtocolUser(User):
 		return Protocol.objects.filter(user=self)
 
 	def get_protocol(self, protocol_name):
-		return self.get_protocols().get(name=protocol_name)
+		return self.get_protocols().filter(name=protocol_name).first()
 
 	def get_experiments(self):
 		return Experiment.objects.filter(user=self)
 
+	@property
+	def get_shared_protocol_count(self):
+		return self.get_shared_protocols().count()
+
+	def get_shared_protocols(self):
+		return SharedProtocol.objects.filter(shared_to=self).order_by('shared_from')
+
+	def get_shared_protocol(self, protocol_id):
+		return Protocol.objects.get(id=protocol_id)
+
 class Protocol(models.Model):
 	user = models.ForeignKey(ProtocolUser, on_delete=models.PROTECT, null=True, blank=True)
-	name = models.CharField(primary_key = True, max_length=100)
+	name = models.CharField(max_length=100)
 	ninstance = models.IntegerField(default=0)
 	last_updated = models.DateTimeField(blank=True, null=True)
 	is_public = models.BooleanField(default=False)
@@ -97,10 +107,24 @@ class Protocol(models.Model):
 	def get_ninstances(self):
 		return self.ninstance
 
+	class Meta:
+		unique_together = ('user', 'name')
+
 class SharedProtocol(models.Model):
 	shared_from = models.ForeignKey(ProtocolUser, on_delete=models.CASCADE, related_name='shared_from')
 	shared_to = models.ForeignKey(ProtocolUser, on_delete=models.CASCADE, related_name='shared_to')
-	protocol = models.ForeignKey(Protocol, on_delete=models.PROTECT)
+	protocol = models.ForeignKey(Protocol, on_delete=models.CASCADE)
+
+	@property
+	def protocol_name(self):
+		return self.protocol.name
+
+	# @property 
+	def protocol_id(self):
+		return self.protocol.id
+
+	class Meta:
+		unique_together = ('shared_from', 'shared_to', 'protocol')
 
 class Step(models.Model):
 	protocol = models.ForeignKey(Protocol, related_name='steps', on_delete=models.CASCADE)

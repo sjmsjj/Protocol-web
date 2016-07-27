@@ -10,7 +10,7 @@
     {% if not protocols %}
 	    <br>
 	    <br>
-	    <h4 class="text-center">You current do not have ongoing experiments, you can go to add protocol section to add new protocols.</h4>
+	    <h4 class="text-center">You current do not have any protocols, you can go to add protocol section to add new protocols.</h4>
     {% else %}
 		<div class='container'>
 			<div class='row'>
@@ -25,8 +25,8 @@
 				        <thead>
 				        	<tr>
 				        		<td width='10%'>Category</td>
-				        		<td width='70%'5>Protocol Name</td>
-				        		<td width='20%' colspan="3">Action</td>
+				        		<td width='60%'5>Protocol Name</td>
+				        		<td width='30%' colspan="4">Action</td>
 				        	</tr>
 				        </thead>
 
@@ -51,6 +51,9 @@
 							        		<button class="btnChangeProcotolAccess btn btn-success" value='{{protocol.name}}' name='{{protocol.name}}'>Make Public&nbsp</button>
 						        		{% endif %}
 						        	</td>
+    								<td>
+				                    	<button class="btnShareProtocol btn btn-info" value='{{protocol.name}}'>Share</button>
+				                    </td>
 									<td>
 				                    	<button class="btnDeleteProtocol btn btn-warning" value='{{protocol.name}}' name='{{protocol.ninstance}}'>Delete</button>
 				                    </td>
@@ -61,8 +64,6 @@
 			    </div>
 		    </div>
 
-	        <button style="display:none" id="btnNewExperimentSuceess" data-toggle="modal" data-target="#myModal"></button>
-
            <br>
            <br>
            <br>
@@ -71,46 +72,13 @@
 				<hr style="margin-top:10px;">
 			</div>
 
-			<div class="row">
-				<div class="col-md-5">
-					<label>Protocol: </label>
-					<div role="form">
-						<div class="form-group">
-							<select id="protocol_list" class="form-control">
-								{% for protocol in protocols %}
-									<option value="{{protocol.name}}">{{protocol.name}}</option>
-								{% endfor %}
-							</select>
-						</div>
-					</div>
-				</div>
-				<div class="col-md-3">
-					<form role="form">
-						<div class="form-group">
-							<label for="start_date" style="display:inline-block;">Start Date: </label>
-							<input type="text" id="datepicker" class="form-control">
-						</div>
-				    </form>
-				</div>
 
-				<div class="col-md-4">
-					<form role="form">
-						<div class="form-group">
-							<label for="start_date" style="display:inline-block;">Short Note(optional): </label>
-							<input type="text" class="form-control" id="new_experiment_note">
-						</div>
-				    </form>
-				</div>
-			</div>
-
-			<div class="row">
-				<div class="col-md-offset-10 col-md-2">
-					<button id="btnStart" class='btn btn-primary btn-block'>Start New Experiment</button>
-				</div>
+			<div id="start_new_experiment">
+				{% include 'protocol/start_new_experiment.html' %}
 			</div>
 
 
-            <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal fade" id="newExperimentModal" role="dialog">
 				<div class="modal-dialog">
 				<!-- Modal content-->
 					<div class="modal-content">
@@ -119,7 +87,7 @@
 							<h4 class="modal-title">Success</h4>
 							</div>
 							<div class="modal-body">
-								<p id="modalContent"></p>
+								<p id="newExperimentModalContent"></p>
 							</div>
 							<div class="modal-footer">
 							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -127,6 +95,34 @@
 					</div>
 				</div>
 			</div>
+
+			<div class="modal fade" id="shareProtocolModal" role="dialog">
+				<div class="modal-dialog">
+				<!-- Modal content-->
+					<div class="modal-content">
+						<div class="modal-header">
+				            <button type="button" class="close" data-dismiss="modal">&times;</button>
+							<h4 id="shared_protocol_title" class="modal-title"></h4>
+						</div>
+						<div class="modal-body">
+							 <form role="form">
+								<div class="form-group">
+									<label for="comment">To:</label>
+									<textarea class="form-control" rows="1" id="shared_emails" placeholder="please separate multiple emails uinsg comma(,)."></textarea>
+								</div>
+							</form>
+							<label id="shared_email_error" class="error_msg hidden">Not all emails are correct.</label>
+						</div>
+						<div class="modal-footer">
+							<button id="btnCollectEmails" type="button" class="btn btn-default">Share</button>
+							<button style="display:none" id="btnHideModal" data-dismiss="modal">Share</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+	        <button style="display:none" id="btnNewExperimentSuceess" data-toggle="modal" data-target="#newExperimentModal"></button>
+	        <button style="display:none" id="btnshareProtocolModal" data-toggle="modal" data-target="#shareProtocolModal"></button>
 
 		</div>
 	{% endif %}

@@ -1,0 +1,61 @@
+<script type="text/javascript">
+    var ACCEPT_PROTOCOL = "accept protocol";
+    var DECLINE_PROTOCOL = "decline protocol";
+
+	var protocol_id;
+	var action;
+
+	var shared_protocol_count = {{shared_protocol_count}};
+
+	$(document).ready(function(){
+		$(".btnAcceptProtocol").bind("click", accept_shared_protocol);
+		$(".btnDeclineProtocol").bind("click", decline_shared_protocol);
+	})
+
+	function accept_shared_protocol(){
+		protocol_id = $(this).attr("value");
+		action = ACCEPT_PROTOCOL;
+		send_action_to_server();
+	}
+
+	function decline_shared_protocol(){
+		protocol_id = $(this).attr("value");
+		action = DECLINE_PROTOCOL;
+		send_action_to_server();
+	}
+
+	function send_action_to_server(){
+		$.ajax({
+			type: "POST",
+			url: "{% url 'accept_shared_protocol' %}",
+			data: {"protocol_id": protocol_id, "action": action},
+			dataType: "text",
+			success: function(response){
+				if(response !== "success"){
+					alert(response);
+				}
+				else{
+					update_shared_protocol_count();
+					delete_processed_protocol();
+				}
+			},
+			error: function(){
+				alert("sorry, this action cannot be completed right now, please try again later");
+			},
+		});
+	}
+
+	function update_shared_protocol_count(){
+		shared_protocol_count--;
+		$("#shared_protocol_count").text(shared_protocol_count);
+		if(shared_protocol_count == 0){
+			$("#shared_protocol_count").removeClass("error_msg");
+		}
+	}
+
+	function delete_processed_protocol(){
+		var table = document.getElementById("tbProtocols");
+		var row = document.getElementById(protocol_id);
+		table.deleteRow(row.rowIndex);
+	}
+</script>

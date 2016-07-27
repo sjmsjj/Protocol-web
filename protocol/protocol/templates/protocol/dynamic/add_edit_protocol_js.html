@@ -39,8 +39,6 @@
 			valid_new_protocol_name = true;
 			$(".error_msg").addClass("hidden");
 		}
-
-
 	}
 
 	function add_row(){
@@ -85,21 +83,14 @@
 				}
 				else{
 					var data = build_json_data(protocol, days, names, details, notes, nsteps);
-					var csrftoken = getCookie('csrftoken');
 					$.ajax({
 						type: "post",
 						url: "{% url 'save_protocol' %}",
 		                data: data,
 		                dataType: "text",
 		                contentType: 'application/json',
-		                // contentType: "application/json",
-		                beforeSend: function(xhr, settings){
-						    xhr.setRequestHeader('X-CSRFToken', csrftoken);
-						    // xhr.setRequestHeader( "Content-type", "application/json" );
-					    },
 					    success: function(response){
 					    	if(response === "success"){
-					    		// alert('h');
 					    		$("#btnRedirect").trigger("click");
 					    	}
 					    	else{
@@ -117,7 +108,6 @@
 		{% if protocol_name %}
 		url = "{% url 'protocol_detail' protocol=protocol_name %}";
 		{% endif %}
-
 		window.location.href=url;
 	}
 

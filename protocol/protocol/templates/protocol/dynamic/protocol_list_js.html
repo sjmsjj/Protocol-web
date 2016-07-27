@@ -12,6 +12,8 @@
 		$("#btnStart").bind('click', start_new_experiment_verbosely);
 		$(".btnStartExperiment").bind('click', start_new_experiment);
 		$(".btnChangeProcotolAccess").bind('click', change_protocol_access_level);
+		$(".btnShareProtocol").bind('click', get_shared_emails);
+		$("#btnCollectEmails").bind('click', send_shared_emails_to_server);
 		$(".btnDeleteProtocol").bind('click', delete_protocol);
 	})
 
@@ -40,6 +42,57 @@
 		send_action_to_server(protocol_name, action);
 	}
 
+	function get_shared_emails(){
+		protocol_name = this.value;
+		$("#shared_protocol_title").html(protocol_name);
+		$("#btnshareProtocolModal").trigger("click"); 
+	}
+
+	function send_shared_emails_to_server(){
+		var emails = document.getElementById("shared_emails").value.toLowerCase();
+		if(!validate_emails(emails)){
+			$("#shared_email_error").removeClass("hidden");
+		}
+		else{
+			$("#shared_email_error").addClass("hidden");
+			var csrftoken = getCookie('csrftoken');
+			$.ajax({
+				type: "POST",
+				url: "{% url 'send_shared_protocol' %}",
+				data: {'protocol':protocol_name, 'emails': emails},
+				dataType: "text",
+				beforeSend: function(xhr, settings){
+				    xhr.setRequestHeader('X-CSRFToken', csrftoken);
+			    },
+			    success: function(response){
+			    	if(response !== "success"){
+			    		alert(response);
+			    	}
+			    	else{
+			    		$("#btnHideModal").trigger("click");
+			    	}
+			    },
+			    error: function(){
+		    		alert("Share protocol failed, please try again later.")
+			    },
+			});
+		}
+	}
+
+	function validate_emails(emails){
+		var no_error = true;
+		var email_list = emails.split(",");
+		var email_pattern = /^[\w-\.]+@[\w]+\.[\w]+$/;
+		for(var i = 0; i < email_list.length; i++){
+			var email = email_list[i].trim();
+			if(!email.match(email_pattern)){
+				no_error = false;
+				break;
+			}
+		}
+		return no_error
+	}
+
 	function delete_protocol(){
 		protocol_name = this.value;
 		action = DELETE_PROTOCOL;
@@ -54,7 +107,6 @@
 	}
 
 	function send_action_to_server(protocol_name, acition, start_date, note){
-		var csrftoken = getCookie('csrftoken');
 		if(typeof start_date === "undefined"){
 			start_date = "";
 			note = "";
@@ -64,11 +116,8 @@
 			url:"{% url 'protocol_list' %}",
 			data: {'protocol':protocol_name, 'action':action, 'start_date':start_date, 'note':note},
 			dataType: 'text',
-			beforeSend: function(xhr, settings){
-			    xhr.setRequestHeader('X-CSRFToken', csrftoken);
-		    },
 		    success: function(response){
-		    	if(response !== 'success'){
+		    	if(response === 'error'){
 		    		alert(response);
 		    	}
 		    	else{
@@ -76,10 +125,10 @@
 		    			notify_initiate_experiment_success();
 		    		}
 		    		else if(action === CHANGE_PROTOCOL_ACCESS_LEVEL){
-		    			update_protocol_access_level(protocol_name);
+		    			update_protocol_access_level();
 		    		}
 		    		else if(action === DELETE_PROTOCOL){
-		    			delete_protocol_row(protocol_name);
+		    			delete_protocol_row(response);
 		    		}
 		    	}
 		    },
@@ -88,26 +137,27 @@
 
 	function notify_initiate_experiment_success(){
 		var modal_content = "Initated new experiment following the protocol: <br><b>" + protocol_name + "</b>.";
-		$("#modalContent").html(modal_content);
+		$("#newExperimentModalContent").html(modal_content);
 		$("#btnNewExperimentSuceess").trigger("click"); 
 	}
 
-	function update_protocol_access_level(protocol_name){
+	function update_protocol_access_level(){
 		var row = document.getElementById(protocol_name);
 		if(row.cells[0].innerHTML === "Private"){
 			row.cells[0].innerHTML = "Public";
-			$("button[name=" + protocol_name + "]").text("Make Private");
+			$("button[name=" + protocol_name.replace(/([ #;&,.+*~\':"!^$[\]()=>|\/@])/g,'\\$1') + "]").text("Make Private");
 		}
 		else{
 			row.cells[0].innerHTML = "Private";
-			$("button[name=" + protocol_name + "]").html("Make Public&nbsp");
+			$("button[name=" + protocol_name.replace(/([ #;&,.+*~\':"!^$[\]()=>|\/@])/g,'\\$1') + "]").html("Make Public&nbsp");
 		}
 	}
 
-	function delete_protocol_row(protocol_name){
+	function delete_protocol_row(response){
 		var table = document.getElementById("tbProtocols");
 		var row = document.getElementById(protocol_name);
 		table.deleteRow(row.rowIndex);
+		$("#start_new_experiment").html(response);
 	}
 
 </script>

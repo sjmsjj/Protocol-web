@@ -136,7 +136,8 @@
 }
 
 table[id="tbProtocols"] thead td,
-table[id="tbSteps"] thead td{
+table[id="tbSteps"] thead td,
+table[id="tbSharedProtocols"] thead td{
    color:#ffffff;
    text-align: center;
    vertical-align: bottom;
