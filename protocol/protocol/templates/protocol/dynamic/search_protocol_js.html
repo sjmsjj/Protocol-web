@@ -1,0 +1,54 @@
+<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.js"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		highLightNavbar();
+		$("#search_form").on("submit", search_protocols);
+	})
+
+	function search_protocols(){
+		var keywords = $("#search").val();
+		$.ajax({
+			type: "POST",
+			url: "{% url 'search_protocol' %}",
+			data: {"name": keywords},
+			dataType: "text",
+			success: function(response){
+				$("#search_results").html(response);
+			    $('#tbSearchedProtocols').dataTable({bFilter: false, 
+			    	                                 bLengthChange: false,
+			    	                                 "fnDrawCallback": function(){
+			    	                                 	$(".btnAddFromSearch").bind("click", add_protocol_from_search);
+			    	                                 }
+				});
+			},
+		});
+	}
+
+	function add_protocol_from_search(){
+	    var protocol_id = $(this).attr("value");
+	    var action = "add from search";
+	    $.ajax({
+	        type: "POST",
+	        url: "{% url 'process_shared_protocol' %}",
+	        data: {"protocol_id": protocol_id, "action": action},
+	        dataType: "text",
+	        success: function(response){
+	            if(response !== "success"){
+	                alert(response);
+	            }
+	            else{
+	                update_search_list(protocol_id);
+	            }
+	        },
+	        error: function(){
+	            alert("sorry, this action cannot be completed right now, please try again later");
+	        },
+	    });
+	}
+
+	function update_search_list(protocol_id){
+		var table = document.getElementById("tbSearchedProtocols");
+		var row = document.getElementById(protocol_id);
+		table.deleteRow(row.rowIndex);
+	}
+	</script>

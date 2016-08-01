@@ -1,0 +1,37 @@
+{% load protocol_tags %}
+
+<style type="text/css">
+    a:link {    /* unvisited link */
+        color: #337ab7;
+    }
+    a:visited {    /* visited link */
+        color: #609;
+    }
+    a:active {    /* active link */
+        color: #337ab7;
+    }
+</style>
+
+{% if not searched_protocols.count %}
+    <label>No Protocols Found.</label>
+{% else %}
+    <table id="tbSearchedProtocols" class="display">
+    	<thead>
+    		<tr>
+    			<td class="text-left"><label>Search Results</label></td>
+    			<td></td>
+    		</tr>
+    	</thead>
+    	<tbody>
+       {% for protocol in searched_protocols %}
+        <tr id="{{protocol.id}}">
+            {% autoescape off %}
+        	<td><a href="{% url 'protocol_detail' protocol=protocol.name %}?protocol_id={{protocol.id}}" target="_blank">
+                {% highlight_search protocol_name=protocol.name keywords=keywords %}</a></td>
+            {% endautoescape %}
+        	<td class="text-right"><button type="button" class="btnAddFromSearch btn btn-primary" value="{{protocol.id}}">Add</button></td>
+        </tr>
+    {% endfor %}
+        </tbody>
+	</table>
+{% endif %}

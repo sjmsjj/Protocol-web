@@ -148,8 +148,6 @@ class Experiment(models.Model):
 	start_date = models.DateTimeField(blank=True, null=True)
 	note = models.TextField(null=True, blank=True)
 
-	today = timezone.now()
-
 	def __unicode__(self):
 		return 'Experiment started on %s following protocol %s' % (str(start_date), protocol.name)
 
@@ -160,7 +158,7 @@ class Experiment(models.Model):
 		finished_steps = []
 		for step in self.protocol.get_steps():
 			date = self.start_date + datetime.timedelta(days=step.day)
-			if date <= self.today:
+			if date <= timezone.now():
 				finished_steps.append({'date':self.format_date(date), 'step':step.name})
 			else:
 				break
@@ -170,7 +168,7 @@ class Experiment(models.Model):
 		unfinished_steps = []
 		for step in self.protocol.get_steps():
 			date = self.start_date + datetime.timedelta(days=step.day)
-			if date > self.today:
+			if date > timezone.now():
 				unfinished_steps.append({'date':self.format_date(date), 'step':step.name})
 		return unfinished_steps
 

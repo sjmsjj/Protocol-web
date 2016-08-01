@@ -22,3 +22,14 @@ def identify_experiment_end(unfinished_steps):
 	counter = int(unfinished_steps)
 	if counter == 0:
 		return 'end'
+
+@register.simple_tag
+def highlight_search(protocol_name=None, keywords=None):
+	string = []
+	keywords.lower()
+	for word in protocol_name.split():
+		if word.lower() in keywords:
+			string.append('<span style="color:red">' + word + "</span>")
+		else:
+			string.append(word)
+	return ' '.join(string)

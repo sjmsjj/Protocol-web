@@ -22,6 +22,7 @@ from django.core.urlresolvers import reverse
 from django.db.models import Q, F, Func, Sum
 from django.db.models.functions import Substr
 from collections import defaultdict
+import django_filters
 import json
 import copy
 import re
@@ -55,6 +56,47 @@ def protocol_login(request, *args, **kwargs):
 		return redirect(reverse('where'), permant=True)
 	else:
 		return login_view(request, *args, **kwargs)
+
+class ProtocolFilter(django_filters.FilterSet):
+	SEARCH_FILTERS = ['name__istartswith', 'name__icontains']
+	name = django_filters.MethodFilter(action='filter_search')
+	filterset = []
+
+	class Meta:
+		model = Protocol
+		fields = ['name']
+
+	def filter_search(self, queryset, value):
+		filterset = [] 
+		for filter in self.SEARCH_FILTERS:
+		    filterset, queryset = self.refine_search(filterset, queryset, {filter:value})
+		self.filterset = filterset
+		return filterset
+
+	def refine_search(self, filterset, queryset, filter_params):
+	    return filterset+list(queryset.filter(**filter_params)), queryset.exclude(**filter_params)
+
+	def __len__(self):
+		return self.queryset.count()
+
+	def count(self):
+		return len(self.filterset)
+
+class SearchProtocolView(TemplateView):
+	template_name = "protocol/search_protocol.html"
+	
+	def post(self, request, *args, **kwargs):
+		user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
+		name = request.POST.get("name")
+		searched_protocols = None
+		if name:
+			searched_protocols = ProtocolFilter(data=request.POST, queryset=Protocol.objects.filter(is_public=True).exclude(user=user))
+		params = {"searched_protocols": searched_protocols,
+		          "keywords": name,
+		          }
+		return HttpResponse(render_to_string("protocol/search_results.html", params))
+
+search_protocol = login_required(SearchProtocolView.as_view())
 
 class MainView(View):
 	def get(self, request, *args, **kwargs):
@@ -178,13 +220,14 @@ protocol_list = login_required(ProtocolListView.as_view())
 class ProtocolDetailView(DetailView):
 	def get(self, request, *args, **kwargs):		
 		user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
-		protocol_name = self.kwargs.get('protocol')
-		editable=True
-		protocol = user.get_protocol(protocol_name)
-		if not protocol:
-			protocol_id = self.request.GET.get('protocol_id')
+		protocol_id = self.request.GET.get('protocol_id')
+		if protocol_id:
 			protocol = user.get_shared_protocol(protocol_id)
 			editable=False
+		else:
+			protocol_name = self.kwargs.get('protocol')
+			editable=True
+			protocol = user.get_protocol(protocol_name)
 		steps = protocol.get_steps()
 		params = {'protocol' : protocol,
 		          'steps' : steps,
@@ -237,7 +280,7 @@ class SendSharedProtocolView(View):
 send_shared_protocol = login_required(SendSharedProtocolView.as_view())
 
 
-class AcceptSharedProtocolView(ListView):
+class ProcessSharedProtocolView(ListView):
 	return_msg = "error"
 	def get(self, request, *args, **kwargs):
 		user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
@@ -253,24 +296,33 @@ class AcceptSharedProtocolView(ListView):
 			try:
 				self.user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
 				protocol = Protocol.objects.get(id=protocol_id)
+				self.return_msg = "search3"
 				if action == "accept protocol":
 					self.accept_shared_protocol(protocol)
 				elif action == "decline protocol":
 					self.decline_shared_protocol(protocol)
+				elif action == "add from search":
+					self.accept_shared_protocol(protocol, from_search=True)
 			except Exception:
 				pass
 		return HttpResponse(self.return_msg)
 
-	def accept_shared_protocol(self, protocol):
-		shared_protocol = self.user.get_shared_protocols().get(protocol=protocol)
-		new_protocol_name = protocol.name + "_from_" + shared_protocol.shared_from.get_first_name()
+	def accept_shared_protocol(self, protocol, from_search=False):
+		shared_protocol = None
+		if from_search:
+			name_postfix = 'Search'
+		else:
+			shared_protocol = self.user.get_shared_protocols().get(protocol=protocol)
+			name_postfix = shared_protocol.shared_from.get_first_name()
+		new_protocol_name = protocol.name + "_from_" + name_postfix
 		count = self.user.get_protocols().filter(name__istartswith=new_protocol_name).count()
 		if count > 0:
 			new_protocol_name += "_" + str(count)
 		new_protocol = Protocol.objects.create(user=self.user, name=new_protocol_name, last_updated=timezone.now())
 		new_protocol.save()
 		self.copy_protocol_steps(protocol, new_protocol)
-		shared_protocol.delete()
+		if not from_search:
+			shared_protocol.delete()
 		self.return_msg = "success"
 
 	def copy_protocol_steps(self, old_protocol, new_protocol):
@@ -282,7 +334,7 @@ class AcceptSharedProtocolView(ListView):
 		self.user.get_shared_protocols().get(protocol=protocol).delete()
 		self.return_msg = "success"
 
-accept_shared_protocol = login_required(AcceptSharedProtocolView.as_view())
+process_shared_protocol = login_required(ProcessSharedProtocolView.as_view())
 
 # the following save/edit code needs to be optimized
 class SaveProtocolAPIView(APIView):

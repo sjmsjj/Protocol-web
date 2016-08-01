@@ -8,6 +8,7 @@
 	var shared_protocol_count = {{shared_protocol_count}};
 
 	$(document).ready(function(){
+		highLightNavbar();
 		$(".btnAcceptProtocol").bind("click", accept_shared_protocol);
 		$(".btnDeclineProtocol").bind("click", decline_shared_protocol);
 	})

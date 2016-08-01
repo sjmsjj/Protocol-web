@@ -65,11 +65,12 @@ urlpatterns += [
 
 urlpatterns += [
     url(r'^protocol/sendSharedProtocol/$', views.send_shared_protocol, name='send_shared_protocol'),
-    url(r'^protocol/acceptSharedProtocol/$', views.accept_shared_protocol, name='accept_shared_protocol'),
+    url(r'^protocol/processSharedProtocol/$', views.process_shared_protocol, name='process_shared_protocol'),
 ]
 
 urlpatterns += [
     url(r'^protocol/$', views.main, name='main'),
+    url(r'^protocol/searchProtocol/$', views.search_protocol, name='search_protocol'),
     url(r'^protocol/addEditProtocol/$', views.add_edit_protocol, name='add_edit_protocol'),
     url(r'^protocol/saveProtocol/$', views.save_protocol, name='save_protocol'),
     url(r'^protocol/protocols/$', views.protocol_list, name='protocol_list'),

@@ -8,13 +8,22 @@
 	var valid_new_protocol_name = true;
 
 	$(document).ready(function(){
-		highLightNavbar()
+		highLightNavbar();
+		$("tbody").sortable();
+		$('tbody').on('sortupdate', update_table_row_number);
         $("#protocol").bind("blur", validate_new_protocol_name);
 		$("#btnAddStep").bind("click", add_row);
 		$("#btnAddProtocol").bind("click", save_protocol);
 		$("#btnCancelSaveProtocol").bind("click", cancel_save_protocol);
 		$("#btnRedirect").bind("click", redirect_to_protocol_detail);
 	})
+
+	function update_table_row_number(){
+		var rows = document.getElementsByTagName("tr");
+		for(var i = 0; i < rows.length; i++){
+			rows[i].cells[0].innerHTML = i;
+		}
+	}
 
 	function validate_new_protocol_name() {
 		var repeated_name = false;
