@@ -34,28 +34,55 @@ urlpatterns = [
     url(r'^protocol/userprofile/$', views.user_profile_view, name='user_profile'),
 ]
 
+
 urlpatterns += [
-    url(r'^password_reset/$', auth_views.password_reset, {
-        'template_name': 'protocol/reset_password/password_reset.html',
-        'email_template_name': 'protocol/reset_password/password_reset.txt',
-        'post_reset_redirect': reverse_lazy('protocol_password_reset_sent'),
-        }, name="protocol_password_reset"),
-    url(r'^password_reset_confirm/(?P<uidb64>\w*)\|(?P<token>[\-a-zA-Z0-9]*)$', auth_views.password_reset_confirm, {
-        'template_name': 'protocol/reset_password/password_reset_confirm.html',
-        'post_reset_redirect': reverse_lazy('protocol_password_reset_complete'),
-        }, name="protocol_password_reset_confirm"),
-    url(r'^password_reset_sent/$', auth_views.password_reset_done, {
-        'template_name': 'protocol/reset_password/password_reset_sent.html',
-        }, name="protocol_password_reset_sent"),
-    url(r'^password_reset_complete/$', auth_views.password_reset_complete, {
-        'template_name': 'protocol/reset_password/password_reset_complete.html',
-        }, name="protocol_password_reset_complete"),
-    url(r'^account_confirm_retry/$', auth_views.password_reset, {
-        'template_name': 'protocol/reset_password/password_reset.html',
-        'email_template_name': 'protocol/account_password.html',
-        'post_reset_redirect': reverse_lazy('protocol_password_reset_sent'),
-        }, name="account_confirm_retry"),
+    url(r'^protocol/password_reset/$', auth_views.password_reset,
+        {'template_name' : 'protocol/reset_password/password_reset_form.html',
+         'email_template_name' : 'protocol/reset_password/password_reset_email.html',
+         'post_reset_redirect' : reverse_lazy('protocol_password_reset_done')},
+         name="protocol_password_reset"),
+
+    url(r'^protocol/password_reset_done/$', auth_views.password_reset_done,
+        {'template_name' : 'protocol/reset_password/password_reset_done.html',},
+        name='protocol_password_reset_done'),
+
+    url(r'^protocol/password_reset_confirm/(?P<uidb64>\w*)\|(?P<token>[\-a-zA-Z0-9]*)/$',
+        auth_views.password_reset_confirm,
+        {'template_name' : 'protocol/reset_password/password_reset_confirm.html',
+         'post_reset_redirect' : reverse_lazy('protocol_password_reset_complete')},
+         name='protocol_password_reset_confirm'), 
+
+    url(r'^protocol/password_reset_complete/$', auth_views.password_reset_complete,
+        {'template_name': 'protocol/reset_password/password_reset_complete.html',},
+        name="protocol_password_reset_complete"),
 ]
+
+# urlpatterns += [
+#     url(r'^password_reset/$', auth_views.password_reset, {
+#         'template_name': 'protocol/reset_password/password_reset.html',
+#         'email_template_name': 'protocol/reset_password/password_reset.txt',
+#         'post_reset_redirect': reverse_lazy('protocol_password_reset_sent'),
+#         }, name="protocol_password_reset"),
+
+#     url(r'^password_reset_confirm/(?P<uidb64>\w*)\|(?P<token>[\-a-zA-Z0-9]*)$', auth_views.password_reset_confirm, {
+#         'template_name': 'protocol/reset_password/password_reset_confirm.html',
+#         'post_reset_redirect': reverse_lazy('protocol_password_reset_complete'),
+#         }, name="protocol_password_reset_confirm"),
+
+#     url(r'^password_reset_sent/$', auth_views.password_reset_done, {
+#         'template_name': 'protocol/reset_password/password_reset_sent.html',
+#         }, name="protocol_password_reset_sent"),
+
+#     url(r'^password_reset_complete/$', auth_views.password_reset_complete, {
+#         'template_name': 'protocol/reset_password/password_reset_complete.html',
+#         }, name="protocol_password_reset_complete"),
+
+#     url(r'^account_confirm_retry/$', auth_views.password_reset, {
+#         'template_name': 'protocol/reset_password/password_reset.html',
+#         'email_template_name': 'protocol/account_password.html',
+#         'post_reset_redirect': reverse_lazy('protocol_password_reset_sent'),
+#         }, name="account_confirm_retry"),
+# ]
 
 
 urlpatterns += [
@@ -76,8 +103,6 @@ urlpatterns += [
     url(r'^protocol/protocols/$', views.protocol_list, name='protocol_list'),
     url(r'^protocol/(?P<protocol>.+)/$', views.protocol_detail, name='protocol_detail'),
 ]
-
-
 
 urlpatterns = format_suffix_patterns(urlpatterns)
 
