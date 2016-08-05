@@ -67,6 +67,9 @@ class ProtocolUser(User):
 	def get_experiments(self):
 		return Experiment.objects.filter(user=self)
 
+	def get_experiment(self, experiment_id):
+		return self.get_experiments().get(id=experiment_id)
+
 	@property
 	def get_shared_protocol_count(self):
 		return self.get_shared_protocols().count()

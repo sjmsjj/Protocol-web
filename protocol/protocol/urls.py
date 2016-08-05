@@ -57,37 +57,11 @@ urlpatterns += [
         name="protocol_password_reset_complete"),
 ]
 
-# urlpatterns += [
-#     url(r'^password_reset/$', auth_views.password_reset, {
-#         'template_name': 'protocol/reset_password/password_reset.html',
-#         'email_template_name': 'protocol/reset_password/password_reset.txt',
-#         'post_reset_redirect': reverse_lazy('protocol_password_reset_sent'),
-#         }, name="protocol_password_reset"),
-
-#     url(r'^password_reset_confirm/(?P<uidb64>\w*)\|(?P<token>[\-a-zA-Z0-9]*)$', auth_views.password_reset_confirm, {
-#         'template_name': 'protocol/reset_password/password_reset_confirm.html',
-#         'post_reset_redirect': reverse_lazy('protocol_password_reset_complete'),
-#         }, name="protocol_password_reset_confirm"),
-
-#     url(r'^password_reset_sent/$', auth_views.password_reset_done, {
-#         'template_name': 'protocol/reset_password/password_reset_sent.html',
-#         }, name="protocol_password_reset_sent"),
-
-#     url(r'^password_reset_complete/$', auth_views.password_reset_complete, {
-#         'template_name': 'protocol/reset_password/password_reset_complete.html',
-#         }, name="protocol_password_reset_complete"),
-
-#     url(r'^account_confirm_retry/$', auth_views.password_reset, {
-#         'template_name': 'protocol/reset_password/password_reset.html',
-#         'email_template_name': 'protocol/account_password.html',
-#         'post_reset_redirect': reverse_lazy('protocol_password_reset_sent'),
-#         }, name="account_confirm_retry"),
-# ]
-
-
 urlpatterns += [
     url(r'^api/protocol/protocols/$', views.api_protocol_list, name='api_protocol_list'),
-    url(r'^api/protocol/(.+)/$', views.api_protocol_detail, name='api_protocol_detail'),
+    url(r'^api/protocol/(?P<protocol_id>[1-9]+)/$', views.api_protocol_detail, name='api_protocol_detail'),
+    url(r'^api/protocol/experiments/$', views.api_experiment_list, name='api_experiment_list'),
+    url(r'^api/protocol/experiment/(?P<experiment_id>[1-9]+)/$', views.api_experiment_detail, name='api_experiment_detail'),
 ]
 
 urlpatterns += [

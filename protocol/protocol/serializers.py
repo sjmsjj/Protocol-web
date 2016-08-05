@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Protocol, Step
+from .models import Protocol, Step, Experiment
 
 class StepSerializer(serializers.ModelSerializer):
 	class Meta:
@@ -11,7 +11,7 @@ class ProtocolSerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = Protocol
-		fields = ['user', 'name', 'ninstance', 'steps']
+		fields = ['id', 'user', 'name', 'ninstance', 'steps']
 
 	def create(self, validated_data):
 		new_steps = validated_data.pop('steps')
@@ -19,3 +19,10 @@ class ProtocolSerializer(serializers.ModelSerializer):
 		for step in new_steps:
 			Step.objects.create(protocol=protocol, **step)
 		return protocol
+
+class ExperimentSerializer(serializers.ModelSerializer):
+	steps = StepSerializer(many=True, read_only=True)
+
+	class Meta:
+		model = Experiment
+		fields = ['id', 'user', 'protocol', 'start_date', 'note', 'steps']

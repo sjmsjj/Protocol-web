@@ -30,7 +30,7 @@ import itertools
 import datetime
 from django.utils import timezone
 from models import Protocol, Experiment, Step, ProtocolUser, SharedProtocol
-from serializers import StepSerializer, ProtocolSerializer
+from serializers import StepSerializer, ProtocolSerializer, ExperimentSerializer
 from django.contrib.auth.forms import UserCreationForm
 from forms import RegistrationForm, UserProfileForm
 
@@ -387,14 +387,32 @@ class ProtocolListAPIView(APIView):
 api_protocol_list = login_required(ProtocolListAPIView.as_view())
 
 class ProtocolDetailAPIView(APIView):
-	def get(self, request, format=None):
+	def get(self, request, protocol_id, format=None):
 		user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
-		protocol_name = self.args[0]
-		protocol = user.get_protocol(protocol_name)
+		protocol = user.get_protocol(protocol_id)
 		serializer = ProtocolSerializer([protocol], many=True)
 		return Response(serializer.data)
 
 api_protocol_detail = login_required(ProtocolDetailAPIView.as_view())
+
+
+class ExperimentListAPIView(APIView):
+	def get(self, request, format=None):
+		user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
+		experiments = user.get_experiments()
+		serializer = ExperimentSerializer(experiments, many=True)
+		return Response(serializer.data)
+
+api_experiment_list = login_required(ExperimentListAPIView.as_view())
+
+class ExperimentDetailAPIView(APIView):
+	def get(self, request, experiment_id, format=None):
+		user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
+		experiment = user.get_experiment(experiment_id)
+		serializer = ExperimentSerializer([experiment], many=True)
+		return Response(serializer.data)
+
+api_experiment_detail = login_required(ExperimentDetailAPIView.as_view())
 
 class ProtocolRouterView(View):
     login_url = 'login'
