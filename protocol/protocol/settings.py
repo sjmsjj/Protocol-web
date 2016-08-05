@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'bootstrap3',
     'rest_framework',
     'protocol',
+    'protocol_api',
 ]
 
 MIDDLEWARE_CLASSES = [

@@ -14,7 +14,7 @@ Including another URLconf
     2. Import the include() function: from django.conf.urls import url, include
     3. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.contrib import admin
 from rest_framework.urlpatterns import format_suffix_patterns
 from django.core.urlresolvers import reverse_lazy
@@ -23,6 +23,7 @@ from forms import UserAuthenticationForm
 import django.contrib.auth.views as auth_views
 
 import views
+import protocol_api.views as api_views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -58,13 +59,6 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-    url(r'^api/protocol/protocols/$', views.api_protocol_list, name='api_protocol_list'),
-    url(r'^api/protocol/(?P<protocol_id>[1-9]+)/$', views.api_protocol_detail, name='api_protocol_detail'),
-    url(r'^api/protocol/experiments/$', views.api_experiment_list, name='api_experiment_list'),
-    url(r'^api/protocol/experiment/(?P<experiment_id>[1-9]+)/$', views.api_experiment_detail, name='api_experiment_detail'),
-]
-
-urlpatterns += [
     url(r'^protocol/sendSharedProtocol/$', views.send_shared_protocol, name='send_shared_protocol'),
     url(r'^protocol/processSharedProtocol/$', views.process_shared_protocol, name='process_shared_protocol'),
 ]
@@ -73,9 +67,13 @@ urlpatterns += [
     url(r'^protocol/$', views.main, name='main'),
     url(r'^protocol/searchProtocol/$', views.search_protocol, name='search_protocol'),
     url(r'^protocol/addEditProtocol/$', views.add_edit_protocol, name='add_edit_protocol'),
-    url(r'^protocol/saveProtocol/$', views.save_protocol, name='save_protocol'),
+    url(r'^protocol/saveProtocol/$', api_views.save_protocol, name='save_protocol'),
     url(r'^protocol/protocols/$', views.protocol_list, name='protocol_list'),
     url(r'^protocol/(?P<protocol>.+)/$', views.protocol_detail, name='protocol_detail'),
+]
+
+urlpatterns += [
+    url(r'^', include('protocol_api.urls')),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

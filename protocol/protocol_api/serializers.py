@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Protocol, Step, Experiment
+from protocol.models import Protocol, Step, Experiment
 
 class StepSerializer(serializers.ModelSerializer):
 	class Meta:

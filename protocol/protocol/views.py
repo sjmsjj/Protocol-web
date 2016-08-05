@@ -30,7 +30,6 @@ import itertools
 import datetime
 from django.utils import timezone
 from models import Protocol, Experiment, Step, ProtocolUser, SharedProtocol
-from serializers import StepSerializer, ProtocolSerializer, ExperimentSerializer
 from django.contrib.auth.forms import UserCreationForm
 from forms import RegistrationForm, UserProfileForm
 
@@ -84,6 +83,12 @@ class ProtocolFilter(django_filters.FilterSet):
 
 class SearchProtocolView(TemplateView):
 	template_name = "protocol/search_protocol.html"
+
+	def get_context_data(self, **kwargs):
+		user = ProtocolUser.objects.get(user_ptr_id=self.request.user.id)
+		context = super(SearchProtocolView, self).get_context_data(**kwargs)
+		context['shared_protocol_count'] = user.get_shared_protocol_count
+		return context
 	
 	def post(self, request, *args, **kwargs):
 		user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
@@ -335,84 +340,6 @@ class ProcessSharedProtocolView(ListView):
 		self.return_msg = "success"
 
 process_shared_protocol = login_required(ProcessSharedProtocolView.as_view())
-
-# the following save/edit code needs to be optimized
-class SaveProtocolAPIView(APIView):
-	def post(self, request, *args, **kwargs):
-		user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
-		request.data['user'] = user
-		edited_protocol_name = request.data.pop('edited_protocol_name')
-		new_protocol_name = request.data.get('name')
-		edited_protocol = []
-		experiments = []
-		if edited_protocol_name:
-			edited_protocol = user.get_protocol(edited_protocol_name)
-			for experiment in edited_protocol.get_experiments():
-				experiments.append(experiment)
-			edited_protocol = [edited_protocol]
-			user.get_protocol(edited_protocol_name).delete()
-
-		serializer = ProtocolSerializer(data=request.data)
-		if serializer.is_valid():
-			new_protocol = None
-			if edited_protocol:
-				serializer.save()
-				new_protocol = user.get_protocol(new_protocol_name)
-				for experiment in experiments:
-					experiment.protocol = new_protocol
-					experiment.save()
-				new_protocol.ninstance = len(experiments)
-				new_protocol.save()
-			else:
-				new_protocol = serializer.save()
-			new_protocol.last_updated = datetime.datetime.today()
-			new_protocol.save() 
-			return HttpResponse('success')
-		else:
-			edited_protocol[0].save()
-	        for experiment in experiments:
-	        	experiment.protocol = edited_protocol
-	        	experiment.save()
-	        return HttpResponse('Cannot save the protocol')
-
-save_protocol = login_required(SaveProtocolAPIView.as_view())
-
-class ProtocolListAPIView(APIView):
-	def get(self, request, format=None):
-		user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
-		protocols = user.get_protocols()
-		serializer = ProtocolSerializer(protocols, many=True)
-		return Response(serializer.data)
-
-api_protocol_list = login_required(ProtocolListAPIView.as_view())
-
-class ProtocolDetailAPIView(APIView):
-	def get(self, request, protocol_id, format=None):
-		user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
-		protocol = user.get_protocol(protocol_id)
-		serializer = ProtocolSerializer([protocol], many=True)
-		return Response(serializer.data)
-
-api_protocol_detail = login_required(ProtocolDetailAPIView.as_view())
-
-
-class ExperimentListAPIView(APIView):
-	def get(self, request, format=None):
-		user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
-		experiments = user.get_experiments()
-		serializer = ExperimentSerializer(experiments, many=True)
-		return Response(serializer.data)
-
-api_experiment_list = login_required(ExperimentListAPIView.as_view())
-
-class ExperimentDetailAPIView(APIView):
-	def get(self, request, experiment_id, format=None):
-		user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
-		experiment = user.get_experiment(experiment_id)
-		serializer = ExperimentSerializer([experiment], many=True)
-		return Response(serializer.data)
-
-api_experiment_detail = login_required(ExperimentDetailAPIView.as_view())
 
 class ProtocolRouterView(View):
     login_url = 'login'
