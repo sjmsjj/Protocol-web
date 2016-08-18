@@ -32,6 +32,7 @@ from django.utils import timezone
 from models import Protocol, Experiment, Step, ProtocolUser, SharedProtocol
 from django.contrib.auth.forms import UserCreationForm
 from forms import RegistrationForm, UserProfileForm
+from django.contrib.auth import get_user_model
 
 class Registration(View):
 	def get(self, request, *args, **kwargs):
@@ -85,13 +86,13 @@ class SearchProtocolView(TemplateView):
 	template_name = "protocol/search_protocol.html"
 
 	def get_context_data(self, **kwargs):
-		user = ProtocolUser.objects.get(user_ptr_id=self.request.user.id)
 		context = super(SearchProtocolView, self).get_context_data(**kwargs)
-		context['shared_protocol_count'] = user.get_shared_protocol_count
+		context['shared_protocol_count'] = self.request.user.get_shared_protocol_count
 		return context
 	
 	def post(self, request, *args, **kwargs):
-		user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
+		# user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
+		user = self.request.user
 		name = request.POST.get("name")
 		searched_protocols = None
 		if name:
@@ -105,7 +106,8 @@ search_protocol = login_required(SearchProtocolView.as_view())
 
 class MainView(View):
 	def get(self, request, *args, **kwargs):
-		user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
+		# user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
+		user = self.request.user
 		order_by = request.GET.get('order_by', 'protocol')
 		if order_by == 'protocol':
 			ongoing_experiments = user.get_experiments().order_by('protocol', 'start_date')
@@ -135,7 +137,7 @@ main = login_required(MainView.as_view())
 
 class AddEditProtocolView(View):
 	def get(self, request, *args, **kwargs):
-		user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
+		user = request.user
 		protocol_name = request.GET.get('protocol_name', '')
 		protocol = None
 		steps = []
@@ -161,22 +163,20 @@ class ProtocolListView(ListView):
 	return_msg = "error"
 
 	def get_queryset(self):
-		self.user = ProtocolUser.objects.get(user_ptr_id=self.request.user.id)
-		return self.user.get_protocols()
+		return self.request.user.get_protocols()
 
 	def get_context_data(self, *args, **kwargs):
 		context = super(ProtocolListView, self).get_context_data(*args, **kwargs)
-		context['shared_protocol_count'] = self.user.get_shared_protocol_count
+		context['shared_protocol_count'] = self.request.user.get_shared_protocol_count
 		return context
 
 	def post(self, request, *args, **kwargs):
-		self.user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
 		try:
 			protocol_name = request.POST.get('protocol')
 			action = request.POST.get('action')
 			start_date = request.POST.get('start_date')
 			note = request.POST.get('note')
-			protocol = self.user.get_protocol(protocol_name)
+			protocol = request.user.get_protocol(protocol_name)
 			if action == 'start new experiment':
 				self.add_new_experiment(protocol, start_date, note)
 			elif action == 'change protocol access level':
@@ -194,7 +194,7 @@ class ProtocolListView(ListView):
 			hour, minute = start_time.hour, start_time.minute
 			start_time = datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute)
 		try:
-			experiment = Experiment.objects.create(user=self.user, start_date=start_time, protocol=protocol, note=note)
+			experiment = Experiment.objects.create(user=self.request.user, start_date=start_time, protocol=protocol, note=note)
 			experiment.save()
 			protocol.ninstance += 1
 			protocol.save()
@@ -224,7 +224,7 @@ protocol_list = login_required(ProtocolListView.as_view())
 
 class ProtocolDetailView(DetailView):
 	def get(self, request, *args, **kwargs):		
-		user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
+		user = self.request.user
 		protocol_id = self.request.GET.get('protocol_id')
 		if protocol_id:
 			protocol = user.get_shared_protocol(protocol_id)
@@ -249,8 +249,7 @@ class UserProfileView(UpdateView):
 	success_url = reverse_lazy('main')
 
 	def get_object(self):
-		user = ProtocolUser.objects.get(user_ptr_id=self.request.user.id)
-		return user
+		return self.request.user
 
 user_profile_view = UserProfileView.as_view()
 
@@ -265,7 +264,7 @@ class SendSharedProtocolView(View):
 		return HttpResponse(self.message)
 
 	def create_shared_protocol(self, protocol_name, emails):
-		from_user = ProtocolUser.objects.get(user_ptr_id=self.request.user.id)
+		from_user = self.request.user
 		try:
 			protocol = from_user.get_protocol(protocol_name)
 			email_list = emails.split(',')
@@ -284,11 +283,10 @@ class SendSharedProtocolView(View):
 
 send_shared_protocol = login_required(SendSharedProtocolView.as_view())
 
-
 class ProcessSharedProtocolView(ListView):
 	return_msg = "error"
 	def get(self, request, *args, **kwargs):
-		user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
+		user = request.user
 		params = {"shared_protocols": user.get_shared_protocols(),
 		          "shared_protocol_count": user.get_shared_protocol_count,
 		          }
@@ -299,7 +297,6 @@ class ProcessSharedProtocolView(ListView):
 		action = request.POST.get("action")
 		if protocol_id and action:
 			try:
-				self.user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
 				protocol = Protocol.objects.get(id=protocol_id)
 				self.return_msg = "search3"
 				if action == "accept protocol":
@@ -317,13 +314,13 @@ class ProcessSharedProtocolView(ListView):
 		if from_search:
 			name_postfix = 'Search'
 		else:
-			shared_protocol = self.user.get_shared_protocols().get(protocol=protocol)
+			shared_protocol = self.request.user.get_shared_protocols().get(protocol=protocol)
 			name_postfix = shared_protocol.shared_from.get_first_name()
 		new_protocol_name = protocol.name + "_from_" + name_postfix
 		count = self.user.get_protocols().filter(name__istartswith=new_protocol_name).count()
 		if count > 0:
 			new_protocol_name += "_" + str(count)
-		new_protocol = Protocol.objects.create(user=self.user, name=new_protocol_name, last_updated=timezone.now())
+		new_protocol = Protocol.objects.create(user=self.request.user, name=new_protocol_name, last_updated=timezone.now())
 		new_protocol.save()
 		self.copy_protocol_steps(protocol, new_protocol)
 		if not from_search:
@@ -336,7 +333,7 @@ class ProcessSharedProtocolView(ListView):
 			new_step.save()
 
 	def decline_shared_protocol(self, protocol):
-		self.user.get_shared_protocols().get(protocol=protocol).delete()
+		self.request.get_shared_protocols().get(protocol=protocol).delete()
 		self.return_msg = "success"
 
 process_shared_protocol = login_required(ProcessSharedProtocolView.as_view())

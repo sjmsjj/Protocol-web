@@ -2,8 +2,9 @@ import logging
 import datetime
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, User
+from django.contrib.auth.models import AbstractUser, BaseUserManager, User
 from django.contrib.auth import get_user_model
+from django.conf import settings
 
 class UserManager(BaseUserManager):
     def create_user(self, first_name, last_name, username, email=None, password=None, **extra_fields):
@@ -27,8 +28,9 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-class ProtocolUser(User):
+class ProtocolUser(AbstractUser):
 	objects = UserManager()
+
 	@property
 	def label(self):
 	    return (self.email if self.email 
@@ -81,7 +83,7 @@ class ProtocolUser(User):
 		return Protocol.objects.get(id=protocol_id)
 
 class Protocol(models.Model):
-	user = models.ForeignKey(ProtocolUser, on_delete=models.PROTECT, null=True, blank=True)
+	user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True)
 	name = models.CharField(max_length=100)
 	ninstance = models.IntegerField(default=0)
 	last_updated = models.DateTimeField(blank=True, null=True)

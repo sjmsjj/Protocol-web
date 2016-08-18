@@ -33,11 +33,9 @@ from protocol.models import Protocol, Experiment, Step, ProtocolUser, SharedProt
 from protocol_api.serializers import StepSerializer, ProtocolSerializer, ExperimentSerializer
 from django.contrib.auth.forms import UserCreationForm
 
-
 class SaveProtocolAPIView(APIView):
 	def post(self, request, *args, **kwargs):
-		user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
-		request.data['user'] = user
+		request.data['user'] = request.user.id
 		edited_protocol_name = request.data.pop('edited_protocol_name')
 		new_protocol_name = request.data.get('name')
 		edited_protocol = []
@@ -48,7 +46,6 @@ class SaveProtocolAPIView(APIView):
 				experiments.append(experiment)
 			edited_protocol = [edited_protocol]
 			user.get_protocol(edited_protocol_name).delete()
-
 		serializer = ProtocolSerializer(data=request.data)
 		if serializer.is_valid():
 			new_protocol = None
@@ -65,19 +62,18 @@ class SaveProtocolAPIView(APIView):
 			new_protocol.last_updated = datetime.datetime.today()
 			new_protocol.save() 
 			return HttpResponse('success')
-		else:
+		elif edited_protocol_name:
 			edited_protocol[0].save()
 	        for experiment in experiments:
 	        	experiment.protocol = edited_protocol
 	        	experiment.save()
-	        return HttpResponse('Cannot save the protocol')
+		return HttpResponse('Cannot save the protocol')
 
 save_protocol = login_required(SaveProtocolAPIView.as_view())
 
 class ProtocolListAPIView(APIView):
 	def get(self, request, format=None):
-		user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
-		protocols = user.get_protocols()
+		protocols = request.user.get_protocols()
 		serializer = ProtocolSerializer(protocols, many=True)
 		return Response(serializer.data)
 
@@ -85,18 +81,15 @@ api_protocol_list = login_required(ProtocolListAPIView.as_view())
 
 class ProtocolDetailAPIView(APIView):
 	def get(self, request, protocol_id, format=None):
-		user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
-		protocol = user.get_protocol(protocol_id)
+		protocol = request.user.get_protocol(protocol_id)
 		serializer = ProtocolSerializer([protocol], many=True)
 		return Response(serializer.data)
 
 api_protocol_detail = login_required(ProtocolDetailAPIView.as_view())
 
-
 class ExperimentListAPIView(APIView):
 	def get(self, request, format=None):
-		user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
-		experiments = user.get_experiments()
+		experiments = request.user.get_experiments()
 		serializer = ExperimentSerializer(experiments, many=True)
 		return Response(serializer.data)
 
@@ -104,8 +97,7 @@ api_experiment_list = login_required(ExperimentListAPIView.as_view())
 
 class ExperimentDetailAPIView(APIView):
 	def get(self, request, experiment_id, format=None):
-		user = ProtocolUser.objects.get(user_ptr_id=request.user.id)
-		experiment = user.get_experiment(experiment_id)
+		experiment = request.user.get_experiment(experiment_id)
 		serializer = ExperimentSerializer([experiment], many=True)
 		return Response(serializer.data)
 
