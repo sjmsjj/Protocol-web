@@ -1,2 +1,2 @@
-# Protocol-web
-Protocol web version
+# Protocol Management Tool
+A web application which supports protocol and experiment management.
